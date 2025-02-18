@@ -1,23 +1,18 @@
 NAME		=	philosophers
 CC			=	cc
-CFLAGS		=	-Wall -Wextra -Werror -g
+CFLAGS		=	-Wall -Wextra -Werror -std=c11 -g
 RM			=	rm
 RMFLAGS		=	-f
 
-SRCDIR		=	./src
-CFILES		=	$(SRCDIR)/philosophers.c \
+SRCDIR		=	src
+CFILES		=	$(SRCDIR)/philosophers.c
 OBJS		=	$(CFILES:.c=.o)
 
 INCLDIR		=	include/
 IFILES		=	$(INCLDIR)philosophers.h
 
-# Link GNU readline on my mac
-UNAME_S		= 	$(shell uname -s)
+LIBS		=	-lpthread
 
-ifeq ($(UNAME_S),Darwin)
-$(info MacOS detected, linking with custom GNU Readline...)
-LIBS		+=	-L/opt/homebrew/opt/readline/lib
-endif
 
 all:			$(NAME)
 
