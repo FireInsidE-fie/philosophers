@@ -5,7 +5,8 @@ RM			=	rm
 RMFLAGS		=	-f
 
 SRCDIR		=	src
-CFILES		=	$(SRCDIR)/philosophers.c
+CFILES		=	$(SRCDIR)/philosophers.c \
+				$(SRCDIR)/s_printf.c
 OBJS		=	$(CFILES:.c=.o)
 
 INCLDIR		=	include/
