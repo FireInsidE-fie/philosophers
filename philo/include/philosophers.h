@@ -30,4 +30,8 @@ typedef struct s_fork
 	mtx_t	mtx;
 }	t_fork;
 
+// Mutex-locked utils - safe_utils.c
+int	swrite_stdout(char *buf);
+int	swrite_stderr(char *buf);
+
 #endif //PHILOSOPHERS_H

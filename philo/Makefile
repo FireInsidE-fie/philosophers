@@ -21,7 +21,6 @@ all:			$(NAME)
 				@printf "\rCompiling $<..."
 				@$(CC) $(CFLAGS) -I$(INCLDIR) -c $< -o $@
 
-# Compile minishell with the existing libs
 $(NAME):		$(OBJS)
 				@printf "\rCompiling $(NAME)..."
 				@$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
