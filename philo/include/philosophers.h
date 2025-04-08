@@ -40,11 +40,15 @@ typedef struct s_fork
 
 t_table	*get_table(void);
 
+// Thinkers functions - thinkers.c
+void	*philo_init(void *input);
+
 // General utils - utils.c
 size_t	ft_strlen(char *str);
 
 // Mutex-locked utils - safe_utils.c
-int		swrite_stdout(char *buf);
-int		swrite_stderr(char *buf);
+size_t	sfwrite_stdout(char *buf);
+size_t	sfwrite_stderr(char *buf);
+int		sfprintf(char *str);
 
 #endif //PHILOSOPHERS_H
