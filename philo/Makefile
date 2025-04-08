@@ -7,7 +7,7 @@ RMFLAGS		=	-f
 SRCDIR		=	src
 CFILES		=	$(SRCDIR)/philosophers.c \
 				$(SRCDIR)/safe_utils.c \
-				$(SRCDIR)/utils.c \
+				$(SRCDIR)/utils.c
 OBJS		=	$(CFILES:.c=.o)
 
 INCLDIR		=	include/
