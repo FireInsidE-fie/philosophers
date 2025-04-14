@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   safe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fireinside <firefoxSpinnie@protonmail.c    +#+  +:+       +#+        */
+/*   By: fireinside <aisling.fontaine@pm.me>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 19:16:31 by fireinside        #+#    #+#             */
 /*   Updated: 2025/04/08 19:16:31 by fireinside       ###   ########.fr       */
