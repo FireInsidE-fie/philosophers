@@ -16,10 +16,12 @@
 # include <stdio.h>
 # include <stdarg.h>
 # include <unistd.h>
+# include <stdlib.h>
 # include <string.h>
 # include <inttypes.h>
 # include <threads.h>
 # include <pthread.h>
+# include <sys/time.h>
 
 // Enums
 typedef enum e_state
@@ -43,9 +45,9 @@ typedef struct s_table
 // Represents a singular philosopher, or thinker.
 typedef struct s_philo
 {
-	__thrd_t	t;
-	t_state		state;
-	t_timestamp	last_change;
+	__thrd_t			t;
+	t_state				state;
+	struct timeval		*last_change;
 }	t_philo;
 
 // Represents a fork and its mutex.
@@ -66,6 +68,5 @@ size_t	ft_strlen(char *str);
 // Mutex-locked utils - safe_utils.c
 size_t	sfwrite_stdout(char *buf);
 size_t	sfwrite_stderr(char *buf);
-int		sfprintf(char *str);
 
-#endif //PHILOSOPHERS_H
+#endif // PHILOSOPHERS_H
