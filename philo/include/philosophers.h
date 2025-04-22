@@ -33,7 +33,7 @@ typedef enum e_state
 
 // Typedefs
 // For readability of which variables represent a point in time
-typedef int	t_timestamp;
+// typedef int	t_timestamp;
 
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
@@ -42,12 +42,13 @@ typedef struct s_table
 	pthread_mutex_t	stderr_mtx;
 }	t_table;
 
-// Represents a singular philosopher, or thinker.
+// Represents a singular philosopher or thinker.
 typedef struct s_philo
 {
-	__thrd_t			t;
+	__thrd_t			thread;
+	int					id;
 	t_state				state;
-	struct timeval		*last_change;
+	struct timeval		last_change;
 }	t_philo;
 
 // Represents a fork and its mutex.

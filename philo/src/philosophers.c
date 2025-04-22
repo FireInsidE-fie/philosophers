@@ -26,10 +26,10 @@ static int	init_mutexes(void)
 	printf("[!] - Initializing mutexes...\n");
 	table = get_table();
 	if (pthread_mutex_init(&table->stdout_mtx, NULL) != 0)
-		return (write(1, "Failed to init mutexes!\n", 25));
+		return (write(1, "Failed to init mutexes!\n", 25), -1);
 	if (pthread_mutex_init(&table->stderr_mtx, NULL) != 0)
-		return (write(1, "Failed to init mutexes!\n", 25));
-	printf("[!] - Successfully initalized mutexes!\n");
+		return (write(1, "Failed to init mutexes!\n", 25), -1);
+	printf("[!] - Successfully initialized mutexes!\n");
 	return (0);
 }
 
@@ -40,9 +40,9 @@ static int	destroy_mutexes(void)
 	printf("[!] - Destroying mutexes...\n");
 	table = get_table();
 	if (pthread_mutex_destroy(&table->stdout_mtx) != 0)
-		return (write(1, "Failed to destroy mutexes!\n", 25));
+		return (write(1, "Failed to destroy mutexes!\n", 25), -1);
 	if (pthread_mutex_init(&table->stderr_mtx, NULL) != 0)
-		return (write(1, "Failed to destroy mutexes!\n", 25));
+		return (write(1, "Failed to destroy mutexes!\n", 25), -1);
 	printf("[!] - Successfully destroyed mutexes!\n");
 	return (0);
 }
@@ -51,7 +51,7 @@ int	main(void)
 {
 	memset(get_table(), 0, sizeof(t_table));
 	init_mutexes();
-	philo_init(NULL);
+	philo_init(1);
 	destroy_mutexes();
 	return (0);
 }

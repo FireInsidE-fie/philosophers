@@ -7,6 +7,7 @@ RMFLAGS		=	-f
 SRCDIR		=	src
 CFILES		=	$(SRCDIR)/philosophers.c \
 				$(SRCDIR)/free_thinkers/thinkers.c \
+				$(SRCDIR)/free_thinkers/thinkers_utils.c \
 				$(SRCDIR)/safe_utils.c \
 				$(SRCDIR)/utils.c
 OBJS		=	$(CFILES:.c=.o)
