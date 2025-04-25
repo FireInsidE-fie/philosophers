@@ -49,9 +49,12 @@ static int	destroy_mutexes(void)
 
 int	main(void)
 {
+	int	philo_count;
+
+	philo_count = 0;
 	memset(get_table(), 0, sizeof(t_table));
 	init_mutexes();
-	philo_init(1);
+	philo_init(&philo_count);
 	destroy_mutexes();
 	return (0);
 }
