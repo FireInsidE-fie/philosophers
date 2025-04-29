@@ -22,6 +22,7 @@
 # include <threads.h>
 # include <pthread.h>
 # include <sys/time.h>
+# include <stdint.h>
 
 // Enums
 typedef enum e_state
@@ -33,11 +34,12 @@ typedef enum e_state
 
 // Typedefs
 // For readability of which variables represent a point in time
-// typedef int	t_timestamp;
+/* typedef int	t_timestamp; */
 
-// The main struct of the program, overseeing the whole simulation.
+/ The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
+	uint32_t		philo_count;
 	pthread_mutex_t	stdout_mtx;
 	pthread_mutex_t	stderr_mtx;
 }	t_table;
@@ -64,6 +66,7 @@ t_table	*get_table(void);
 void	*philo_init(void *input);
 
 // General utils - utils.c
+int		ft_atoi(const char *str);
 size_t	ft_strlen(const char *str);
 
 // Mutex-locked utils - safe_utils.c

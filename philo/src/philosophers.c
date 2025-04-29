@@ -47,14 +47,15 @@ static int	destroy_mutexes(void)
 	return (0);
 }
 
-int	main(void)
+int	main(int argc, char **argv)
 {
-	int	philo_count;
-
-	philo_count = 0;
+	if (argc < 5 || argc > 6)
+		return (1);
+	get_table()->philo_count = ft_atoi(argv[1]);
+	printf("[!] - Philo count = %d\n", get_table()->philo_count);
 	memset(get_table(), 0, sizeof(t_table));
 	init_mutexes();
-	philo_init(&philo_count);
+	philo_init(&(get_table()->philo_count));
 	destroy_mutexes();
 	return (0);
 }
