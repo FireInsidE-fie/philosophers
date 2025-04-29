@@ -64,7 +64,7 @@ t_table	*get_table(void);
 void	*philo_init(void *input);
 
 // General utils - utils.c
-size_t	ft_strlen(char *str);
+size_t	ft_strlen(const char *str);
 
 // Mutex-locked utils - safe_utils.c
 size_t	sfwrite_stdout(char *buf);
