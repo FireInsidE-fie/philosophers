@@ -36,7 +36,7 @@ typedef enum e_state
 // For readability of which variables represent a point in time
 /* typedef int	t_timestamp; */
 
-/ The main struct of the program, overseeing the whole simulation.
+// The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
 	uint32_t		philo_count;
