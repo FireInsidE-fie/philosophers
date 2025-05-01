@@ -12,11 +12,25 @@
 
 #include "philosophers.h"
 
+/**
+ * @brief Initializes the philosophers' table if needed and returns a pointer
+ * to it.
+ */
 t_table	*get_table(void)
 {
-	static t_table	table;
+	static t_table	*table;
 
-	return (&table);
+	if (!table)
+	{
+		table = malloc(sizeof(t_table));
+		if (!table)
+			return (NULL);
+		memset(table, 0, sizeof(t_table));
+		table->philos = malloc(sizeof(pthread_t) * table->philo_count);
+		if (!table->philos)
+			free(table);
+	}
+	return (table);
 }
 
 static int	init_mutexes(void)
@@ -54,11 +68,13 @@ int	main(int argc, char **argv)
 	if (argc < 5 || argc > 6)
 		return (1);
 	table = get_table();
+	if (!table)
+		return (1);
 	table->philo_count = ft_atoi(argv[1]);
 	printf("[!] - Philo count = %d\n", table->philo_count);
-	memset(table, 0, sizeof(t_table));
 	init_mutexes();
-	philo_init(&(table->philo_count));
+	launch_threads();
+	wait_on_threads();
 	destroy_mutexes();
 	return (0);
 }

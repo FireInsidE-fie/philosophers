@@ -24,7 +24,7 @@
 # include <sys/time.h>
 # include <stdint.h>
 
-// Enums
+// Enums =======================================================================
 typedef enum e_state
 {
 	EAT,
@@ -32,25 +32,25 @@ typedef enum e_state
 	THINK
 }	t_state;
 
-// Typedefs
-// For readability of which variables represent a point in time
-/* typedef int	t_timestamp; */
+// Typedefs ====================================================================
 
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
-	uint32_t		philo_count;
+	int				philo_count;
+	pthread_mutex_t	table_mtx;
 	pthread_mutex_t	stdout_mtx;
 	pthread_mutex_t	stderr_mtx;
+	pthread_t		*philos;
 }	t_table;
 
 // Represents a singular philosopher or thinker.
 typedef struct s_philo
 {
-	__thrd_t			thread;
-	int					id;
-	t_state				state;
-	struct timeval		last_change;
+	__thrd_t		thread;
+	int				id;
+	t_state			state;
+	struct timeval	last_change;
 }	t_philo;
 
 // Represents a fork and its mutex.
@@ -60,10 +60,16 @@ typedef struct s_fork
 	pthread_mutex_t	mtx;
 }	t_fork;
 
+// Functions ===================================================================
+
 t_table	*get_table(void);
 
 // Thinkers functions - thinkers.c
 void	*philo_init(void *input);
+
+// Threads functions - threads.c
+int		launch_threads(void);
+int		wait_on_threads(void);
 
 // General utils - utils.c
 int		ft_atoi(const char *str);
