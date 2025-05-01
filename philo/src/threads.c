@@ -25,6 +25,9 @@ int	launch_threads(void)
 		i++;
 	}
 	pthread_mutex_unlock(&(get_table()->table_mtx));
+	pthread_mutex_lock(&(get_table()->stdout_mtx));
+	printf("[!] - Successfully launched %d threads!\n", i);
+	pthread_mutex_unlock(&(get_table()->stdout_mtx));
 	return (0);
 }
 

@@ -26,9 +26,6 @@ t_table	*get_table(void)
 		if (!table)
 			return (NULL);
 		memset(table, 0, sizeof(t_table));
-		table->philos = malloc(sizeof(pthread_t) * table->philo_count);
-		if (!table->philos)
-			free(table);
 	}
 	return (table);
 }
@@ -65,7 +62,6 @@ static int	destroy_mutexes(void)
 	return (0);
 }
 
-// TODO : find a way to fix race conditions on philosophers as they are being initialized
 int	main(int argc, char **argv)
 {
 	t_table *table;
@@ -76,6 +72,9 @@ int	main(int argc, char **argv)
 	if (!table)
 		return (1);
 	table->philo_count = ft_atoi(argv[1]);
+	table->philos = malloc(sizeof(pthread_t) * table->philo_count);
+	if (!table->philos)
+		return (free(table), 1);
 	printf("[!] - Philo count = %d\n", table->philo_count);
 	init_mutexes();
 	launch_threads();
