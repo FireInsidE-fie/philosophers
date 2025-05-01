@@ -40,9 +40,9 @@ static int	init_mutexes(void)
 	printf("[!] - Initializing mutexes...\n");
 	table = get_table();
 	if (pthread_mutex_init(&table->stdout_mtx, NULL) != 0)
-		return (write(1, "Failed to init mutexes!\n", 25), -1);
+		return (write(1, "[!] - Failed to init mutexes!\n", 30), -1);
 	if (pthread_mutex_init(&table->stderr_mtx, NULL) != 0)
-		return (write(1, "Failed to init mutexes!\n", 25), -1);
+		return (write(1, "[!] - Failed to init mutexes!\n", 30), -1);
 	printf("[!] - Successfully initialized mutexes!\n");
 	return (0);
 }
@@ -61,6 +61,7 @@ static int	destroy_mutexes(void)
 	return (0);
 }
 
+// TODO : find a way to fix race conditions on philosophers as they are being initialized
 int	main(int argc, char **argv)
 {
 	t_table *table;

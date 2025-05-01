@@ -34,6 +34,22 @@ typedef enum e_state
 
 // Typedefs ====================================================================
 
+// Represents a fork and its mutex.
+typedef struct s_fork
+{
+	int8_t			status;
+	pthread_mutex_t	mtx;
+}	t_fork;
+
+// Represents a singular philosopher or thinker.
+typedef struct s_philo
+{
+	int				id;
+	t_state			state;
+	struct timeval	last_change;
+	pthread_mutex_t	mtx;
+}	t_philo;
+
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
@@ -43,22 +59,6 @@ typedef struct s_table
 	pthread_mutex_t	stderr_mtx;
 	pthread_t		*philos;
 }	t_table;
-
-// Represents a singular philosopher or thinker.
-typedef struct s_philo
-{
-	__thrd_t		thread;
-	int				id;
-	t_state			state;
-	struct timeval	last_change;
-}	t_philo;
-
-// Represents a fork and its mutex.
-typedef struct s_fork
-{
-	int8_t			status;
-	pthread_mutex_t	mtx;
-}	t_fork;
 
 // Functions ===================================================================
 
