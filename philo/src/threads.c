@@ -17,7 +17,7 @@ int	launch_threads(void)
 		{
 			pthread_mutex_unlock(&(get_table()->table_mtx));
 			sfwrite_stderr("[!] - Failed to create a thread!\n");
-			sfwrite_stderr("[!] - Attempting to wait for create threads...\n");
+			sfwrite_stderr("[!] - Attempting to wait for created threads...\n");
 			while (i >= 0)
 				pthread_join(table->philos[--i], NULL);
 			return (1);

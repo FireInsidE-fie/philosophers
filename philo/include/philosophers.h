@@ -62,6 +62,7 @@ typedef struct s_table
 
 // Functions ===================================================================
 
+// Main file - philosophers.c
 t_table	*get_table(void);
 
 // Thinkers functions - thinkers.c
