@@ -56,14 +56,14 @@ int	init_mutexes(void)
 	if (pthread_mutex_init(&table->mtx, NULL) != 0
 		|| (pthread_mutex_init(&table->stdout_mtx, NULL) != 0)
 		|| (pthread_mutex_init(&table->stderr_mtx, NULL) != 0))
-		return (write(1, "[!] - Failed to init mutexes!\n", 30),
+		return (printf("%s[!] - Failed to init mutexes!%s\n", KRED, KNRM),
 			destroy_mutexes(), -1);
 	i = 0;
 	while (i < table->philo_count)
 	{
 		if (pthread_mutex_init(&table->philos[i].mtx, NULL)
 			|| (pthread_mutex_init(&table->forks[i].mtx, NULL)))
-			return (write(1, "[!] - Failed to init mutexes!\n", 30),
+			return (printf("%s[!] - Failed to init mutexes!%s\n", KRED, KNRM),
 				destroy_mutexes(), -1);
 		i++;
 	}
@@ -80,19 +80,19 @@ void	destroy_mutexes(void)
 	table = get_table();
 	pthread_mutex_lock(&table->mtx);
 	if (pthread_mutex_destroy(&table->stdout_mtx) != 0)
-		write(1, "[!] - Failed to destroy mutexes!\n", 33);
+		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 	if (pthread_mutex_destroy(&table->stderr_mtx) != 0)
-		write(1, "[!] - Failed to destroy mutexes!\n", 33);
+		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 	i = 0;
 	while (i < table->philo_count)
 	{
 		if (pthread_mutex_destroy(&table->philos[i].mtx)
 			|| (pthread_mutex_destroy(&table->forks[i].mtx)))
-			write(1, "[!] - Failed to destroy mutexes!\n", 30);
+			printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 		i++;
 	}
 	pthread_mutex_unlock(&table->mtx);
 	if (pthread_mutex_destroy(&table->mtx) != 0)
-		write(1, "[!] - Failed to destroy mutexes!\n", 33);
+		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 	printf("[!] - Finished destroying mutexes!\n");
 }

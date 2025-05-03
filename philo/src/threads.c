@@ -23,6 +23,7 @@ int	launch_threads(void)
 			return (1);
 		}
 		i++;
+		usleep(100);
 	}
 	pthread_mutex_unlock(&(table->mtx));
 	pthread_mutex_lock(&(table->stdout_mtx));
@@ -37,7 +38,7 @@ int	wait_on_threads(void)
 	int			i;
 
 	table = get_table();
-	sfwrite_stdout("[!] - Waiting for threads to finish...\n");
+	sfwrite_stderr("[!] - Waiting for threads to finish...\n");
 	i = 0;
 	while (i < table->philo_count)
 	{

@@ -24,8 +24,8 @@ void	*philo_init(void *input)
 	t_table	*table;
 	t_philo self;
 
-	table = get_table();
 	self.id = *(int *)input;
+	table = get_table();
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Creating philosopher %d...\n", self.id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
