@@ -6,6 +6,7 @@ RMFLAGS		=	-f
 
 SRCDIR		=	src
 CFILES		=	$(SRCDIR)/philosophers.c \
+				$(SRCDIR)/table.c \
 				$(SRCDIR)/threads.c \
 				$(SRCDIR)/free_thinkers/thinkers.c \
 				$(SRCDIR)/free_thinkers/thinkers_utils.c \

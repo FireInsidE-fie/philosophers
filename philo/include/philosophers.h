@@ -38,6 +38,7 @@ typedef enum e_state
 typedef struct s_fork
 {
 	int8_t			status;
+	struct s_philo	*last_eater;
 	pthread_mutex_t	mtx;
 }	t_fork;
 
@@ -45,6 +46,9 @@ typedef struct s_fork
 typedef struct s_philo
 {
 	int				id;
+	pthread_t		thread;
+	t_fork			*left_fork;
+	t_fork			*right_fork;
 	t_state			state;
 	struct timeval	last_change;
 	pthread_mutex_t	mtx;
@@ -54,16 +58,21 @@ typedef struct s_philo
 typedef struct s_table
 {
 	int				philo_count;
-	pthread_mutex_t	table_mtx;
+	pthread_mutex_t	mtx;
 	pthread_mutex_t	stdout_mtx;
 	pthread_mutex_t	stderr_mtx;
-	pthread_t		*philos;
+	t_philo			*philos;
+	t_fork			*forks;
 }	t_table;
 
 // Functions ===================================================================
 
-// Main file - philosophers.c
+// Table functions - table.c
 t_table	*get_table(void);
+int		init_table(char **argv);
+void	clean_table(void);
+int		init_mutexes(void);
+void destroy_mutexes(void);
 
 // Thinkers functions - thinkers.c
 void	*philo_init(void *input);

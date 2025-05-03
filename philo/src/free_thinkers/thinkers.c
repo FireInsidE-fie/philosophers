@@ -19,13 +19,6 @@ static void	philo_destroy(t_philo self)
 	pthread_mutex_unlock(&(get_table()->stdout_mtx));
 }
 
-// static int	philo_init_mutexes(t_philo *self)
-// {
-// 	if (pthread_mutex_init(&self->mtx, NULL) == -1)
-// 		return (write(1, "[!] - Failed to init a philo's mutex!\n", 38), -1);
-// 	return (0);
-// }
-
 void	*philo_init(void *input)
 {
 	t_table	*table;
