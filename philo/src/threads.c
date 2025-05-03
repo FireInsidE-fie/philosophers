@@ -7,15 +7,15 @@ int	launch_threads(void)
 
 	table = get_table();
 	i = 0;
-	pthread_mutex_lock(&(get_table()->table_mtx));
+	pthread_mutex_lock(&(table->table_mtx));
 	while (i < table->philo_count)
 	{
-		pthread_mutex_lock(&(get_table()->stdout_mtx));
+		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("[!] - Launching thread %d...\n", i);
-		pthread_mutex_unlock(&(get_table()->stdout_mtx));
+		pthread_mutex_unlock(&(table->stdout_mtx));
 		if (pthread_create(&table->philos[i], NULL, philo_init, &i) != 0)
 		{
-			pthread_mutex_unlock(&(get_table()->table_mtx));
+			pthread_mutex_unlock(&(table->table_mtx));
 			sfwrite_stderr("[!] - Failed to create a thread!\n");
 			sfwrite_stderr("[!] - Attempting to wait for created threads...\n");
 			while (i >= 0)
@@ -24,10 +24,10 @@ int	launch_threads(void)
 		}
 		i++;
 	}
-	pthread_mutex_unlock(&(get_table()->table_mtx));
-	pthread_mutex_lock(&(get_table()->stdout_mtx));
+	pthread_mutex_unlock(&(table->table_mtx));
+	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Successfully launched %d threads!\n", i);
-	pthread_mutex_unlock(&(get_table()->stdout_mtx));
+	pthread_mutex_unlock(&(table->stdout_mtx));
 	return (0);
 }
 
@@ -37,11 +37,13 @@ int	wait_on_threads(void)
 	int			i;
 
 	table = get_table();
-	i = table->philo_count;
+	sfwrite_stdout("[!] - Waiting for threads to finish...\n");
+	i = 0;
 	while (i < table->philo_count)
 	{
-		if (pthread_join(table->philos[--i], NULL) != 0)
+		if (pthread_join(table->philos[i], NULL) != 0)
 			sfwrite_stderr("[!] - Failed to join a thread!");
+		i++;
 	}
 	return (0);
 }

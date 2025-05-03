@@ -52,19 +52,19 @@ static int	destroy_mutexes(void)
 	table = get_table();
 	pthread_mutex_lock(&table->table_mtx);
 	if (pthread_mutex_destroy(&table->stdout_mtx) != 0)
-		return (write(1, "Failed to destroy mutexes!\n", 25), -1);
+		return (write(1, "[!] - Failed to destroy mutexes!\n", 33), -1);
 	if (pthread_mutex_destroy(&table->stderr_mtx) != 0)
-		return (write(1, "Failed to destroy mutexes!\n", 25), -1);
+		return (write(1, "[!] - Failed to destroy mutexes!\n", 33), -1);
 	pthread_mutex_unlock(&table->table_mtx);
 	if (pthread_mutex_destroy(&table->table_mtx) != 0)
-		return (write(1, "Failed to destroy mutexes!\n", 25), -1);
+		return (write(1, "[!] - Failed to destroy mutexes!\n", 33), -1);
 	printf("[!] - Successfully destroyed mutexes!\n");
 	return (0);
 }
 
 int	main(int argc, char **argv)
 {
-	t_table *table;
+	t_table	*table;
 
 	if (argc < 5 || argc > 6)
 		return (1);
@@ -80,5 +80,7 @@ int	main(int argc, char **argv)
 	launch_threads();
 	wait_on_threads();
 	destroy_mutexes();
+	free(table->philos);
+	free(table);
 	return (0);
 }
