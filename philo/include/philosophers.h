@@ -24,6 +24,7 @@
 # include <pthread.h>
 # include <sys/time.h>
 # include <stdint.h>
+# include <stdbool.h>
 
 // Color macros ================================================================
 # define KNRM  "\x1B[0m"
@@ -36,12 +37,12 @@
 # define KWHT  "\x1B[37m"
 
 // Enums =======================================================================
-typedef enum e_state
+typedef enum e_action
 {
 	EAT,
 	SLEEP,
 	THINK
-}	t_state;
+}	t_action;
 
 // Typedefs ====================================================================
 
@@ -56,22 +57,28 @@ typedef struct s_fork
 // Represents a singular philosopher or thinker.
 typedef struct s_philo
 {
-	int				id;
+	uint8_t			id;
+	bool			alive;
 	pthread_t		thread;
 	t_fork			*left_fork;
 	t_fork			*right_fork;
-	t_state			state;
+	t_action		action;
 	struct timeval	last_change;
+	uint32_t		times_eaten;
 	pthread_mutex_t	mtx;
 }	t_philo;
 
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
-	int				philo_count;
-	pthread_mutex_t	mtx;
-	pthread_mutex_t	stdout_mtx;
-	pthread_mutex_t	stderr_mtx;
+	uint8_t			philo_count;
+	pthread_mutex_t	mtx;				// Mutex for the table
+	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
+	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
+	uint32_t		time_die;			// Time a philo takes to die after eating
+	uint32_t		time_eat;			// Time it takes to eat
+	uint32_t		time_sleep;			// Time it takes to sleep
+	uint32_t		min_times_eaten;	// Number of times all philos need to eat
 	t_philo			*philos;
 	t_fork			*forks;
 }	t_table;
@@ -83,7 +90,7 @@ t_table	*get_table(void);
 int		init_table(char **argv);
 void	clean_table(void);
 int		init_mutexes(void);
-void destroy_mutexes(void);
+void	destroy_mutexes(void);
 
 // Thinkers functions - thinkers.c
 void	*philo_init(void *input);

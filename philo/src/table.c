@@ -32,6 +32,10 @@ int	init_table(char **argv)
 	table->forks = malloc(sizeof(t_fork) * table->philo_count);
 	if (!table->forks)
 		return (free(table->philos), free(table), 1);
+	table->time_die = ft_atoi(argv[2]);
+	table->time_eat = ft_atoi(argv[3]);
+	table->time_sleep = ft_atoi(argv[4]);
+	printf("[!] - Arguments gotten : %u - %u - %u\n", table->time_die, table->time_eat, table->time_sleep);
 	return (0);
 }
 
