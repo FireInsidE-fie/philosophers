@@ -8,6 +8,7 @@ int	launch_threads(void)
 	table = get_table();
 	i = 0;
 	pthread_mutex_lock(&(table->mtx));
+	// create monitor thread here
 	while (i < table->philo_count)
 	{
 		pthread_mutex_lock(&(table->stdout_mtx));
@@ -22,8 +23,8 @@ int	launch_threads(void)
 				pthread_join(table->philos[--i].thread, NULL);
 			return (1);
 		}
-		i++;
 		usleep(100);
+		i++;
 	}
 	pthread_mutex_unlock(&(table->mtx));
 	pthread_mutex_lock(&(table->stdout_mtx));

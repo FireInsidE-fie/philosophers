@@ -13,6 +13,8 @@
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
+# define _DEFAULT_SOURCE
+
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
