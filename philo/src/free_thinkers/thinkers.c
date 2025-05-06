@@ -14,12 +14,18 @@
 
 void	update_last_change(t_philo *self)
 {
+	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_change, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
+	pthread_mutex_unlock(&self->mtx);
 }
 
 static void	philo_eat(t_table *table, t_philo *self)
 {
+	pthread_mutex_lock(&self->mtx);
+	if (gettimeofday(&self->last_meal, NULL) == -1)
+		sfwrite_stderr("[!] - Failed to get time of day!\n");
+	pthread_mutex_unlock(&self->mtx);
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%li:%li - %d is eating...%s\n", KYEL,
@@ -29,6 +35,9 @@ static void	philo_eat(t_table *table, t_philo *self)
 	usleep(table->time_eat * 1000);
 }
 
+/**
+ * @brief Philosophers think while they are waiting for forks.
+ */
 static void	philo_think(t_table *table, t_philo *self)
 {
 	update_last_change(self);

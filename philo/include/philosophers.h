@@ -65,7 +65,8 @@ typedef struct s_philo
 	t_fork			*left_fork;
 	t_fork			*right_fork;
 	t_action		action;			// The action the philo is currently doing
-	struct timeval	last_change;	// The last time the philo changed actions
+	struct timeval	last_change;	// The last time the philo changed states
+	struct timeval	last_meal;		// The time the last meal started at
 	uint32_t		times_eaten;
 	pthread_mutex_t	mtx;			// TODO : is this even useful?
 }	t_philo;
@@ -79,10 +80,10 @@ typedef struct s_table
 	pthread_mutex_t	mtx;				// Mutex for the table
 	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
 	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
-	uint32_t		time_die;			// Time a philo takes to die after eating
+	uint32_t		time_die;			// Time it takes to die after eating
 	uint32_t		time_eat;			// Time it takes to eat
 	uint32_t		time_sleep;			// Time it takes to sleep
-	uint32_t		min_times_eaten;	// Number of times all philos need to eat
+	uint32_t		min_times_eaten;	// Number of times everyone needs to eat
 	t_philo			*philos;
 	t_fork			*forks;
 }	t_table;

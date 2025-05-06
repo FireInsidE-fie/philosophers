@@ -5,11 +5,14 @@
  */
 bool has_starved(const t_philo *philo)
 {
-	uint64_t			difference;
+	uint64_t		difference;
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	difference = get_timestamp(time) - get_timestamp(philo->last_change);
+	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
+	// FIXME : sometimes the difference goes below 0 and launches up to billions
+	// thinking this only happens when the last meal is in a second and the current time is in another?
+	// just let the program run for a while and you'll see what I mean
 	if (difference > get_table()->time_die)
 	{
 		pthread_mutex_lock(&(get_table()->stdout_mtx));
@@ -23,7 +26,7 @@ bool has_starved(const t_philo *philo)
 void	*monitor(void *input)
 {
 	t_table	*table;
-	int i;
+	int		i;
 
 	(void)input;
 	table = get_table();
