@@ -20,8 +20,11 @@
 # include <stdlib.h>
 # include <string.h>
 # include <inttypes.h>
-# include <threads.h>
-# include <pthread.h>
+# ifdef __APPLE__
+#  include <pthread.h>
+# else
+#  include <thread.h>
+# endif
 # include <sys/time.h>
 # include <stdint.h>
 # include <stdbool.h>
