@@ -11,7 +11,12 @@ bool has_starved(const t_philo *philo)
 	gettimeofday(&time, NULL);
 	difference = get_timestamp(time) - get_timestamp(philo->last_change);
 	if (difference > get_table()->time_die)
+	{
+		pthread_mutex_lock(&(get_table()->stdout_mtx));
+		printf("[!] - Difference is %lu...\n", difference);
+		pthread_mutex_unlock(&(get_table()->stdout_mtx));
 		return (true);
+	}
 	return (false);
 }
 
@@ -28,8 +33,9 @@ void	*monitor(void *input)
 		pthread_mutex_lock(&(table->mtx));
 		if (has_starved(&table->philos[i]) == true)
 		{
-			table->philos[i].alive = false;
+			update_last_change(&table->philos[i]);
 			table->run_simulation = false;
+			table->philos[i].alive = false;
 			pthread_mutex_unlock(&(table->mtx));
 			break ;
 		}
@@ -88,5 +94,7 @@ int	wait_on_threads(void)
 			sfwrite_stderr("[!] - Failed to join a thread!");
 		i++;
 	}
+	if (pthread_join(table->waiter, NULL) != 0)
+		sfwrite_stderr("[!] - Failed to join a thread!");
 	return (0);
 }

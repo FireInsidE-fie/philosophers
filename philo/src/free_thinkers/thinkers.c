@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-static void	update_last_change(t_philo *self)
+void	update_last_change(t_philo *self)
 {
 	if (gettimeofday(&self->last_change, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
@@ -52,8 +52,9 @@ static void	philo_sleep(t_table *table, t_philo *self)
 
 void	*philo_init(void *input)
 {
-	t_table	*table;
-	t_philo *self;
+	t_action	state;
+	t_table		*table;
+	t_philo		*self;
 
 	table = get_table();
 	self = &table->philos[*(int *)input];
@@ -63,15 +64,21 @@ void	*philo_init(void *input)
 	// pthread_mutex_lock(&(table->stdout_mtx));
 	// printf("[!] - Creating philosopher %d...\n", self->id);
 	// pthread_mutex_unlock(&(table->stdout_mtx));
-	while (table->run_simulation) // check for number of times eaten if program was launched with according argument
+	state = 0;
+	while (table->run_simulation == true) // check for number of times eaten if program was launched with according argument
 	{
-		philo_think(table, self);
-		philo_eat(table, self);
-		philo_sleep(table, self);
+		if (state == THINK)
+			philo_think(table, self);
+		else if (state == EAT)
+			philo_eat(table, self);
+		else if (state == SLEEP)
+			philo_sleep(table, self);
+		state++;
+		if (state > 2)
+			state = 0;
 	}
 	if (self->alive == false)
 	{
-		update_last_change(self);
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("%s%li:%li - %d has died!%s\n", KRED,
 			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,

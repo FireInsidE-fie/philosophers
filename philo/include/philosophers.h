@@ -20,10 +20,9 @@
 # include <stdlib.h>
 # include <string.h>
 # include <inttypes.h>
-# ifdef __APPLE__
-#  include <pthread.h>
-# else
-#  include <thread.h>
+# include <pthread.h>
+# ifndef __APPLE__
+#  include <threads.h>
 # endif
 # include <sys/time.h>
 # include <stdint.h>
@@ -42,9 +41,9 @@
 // Enums =======================================================================
 typedef enum e_action
 {
+	THINK,
 	EAT,
-	SLEEP,
-	THINK
+	SLEEP
 }	t_action;
 
 // Typedefs ====================================================================
@@ -98,6 +97,7 @@ int			init_mutexes(void);
 void		destroy_mutexes(void);
 
 // Thinkers functions - thinkers.c
+void		update_last_change(t_philo *self);
 void		*philo_init(void *input);
 
 // Threads functions - threads.c
