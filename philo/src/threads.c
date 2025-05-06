@@ -1,5 +1,46 @@
 #include "philosophers.h"
 
+/**
+ * @brief Checks if a given philosopher has taken too much time to eat.
+ */
+bool has_starved(const t_philo *philo)
+{
+	uint64_t			difference;
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	difference = get_timestamp(time) - get_timestamp(philo->last_change);
+	if (difference > get_table()->time_die)
+		return (true);
+	return (false);
+}
+
+void	*monitor(void *input)
+{
+	t_table	*table;
+	int i;
+
+	(void)input;
+	table = get_table();
+	i = 0;
+	while (i < table->philo_count)
+	{
+		pthread_mutex_lock(&(table->mtx));
+		if (has_starved(&table->philos[i]) == true)
+		{
+			table->philos[i].alive = false;
+			table->run_simulation = false;
+			pthread_mutex_unlock(&(table->mtx));
+			break ;
+		}
+		pthread_mutex_unlock(&(table->mtx));
+		i++;
+		if (i == table->philo_count)
+			i = 0; // infinite loop
+	}
+	return (NULL);
+}
+
 int	launch_threads(void)
 {
 	t_table		*table;
@@ -8,12 +49,12 @@ int	launch_threads(void)
 	table = get_table();
 	i = 0;
 	pthread_mutex_lock(&(table->mtx));
-	// create monitor thread here
+	pthread_create(&table->waiter, NULL, monitor, NULL);
 	while (i < table->philo_count)
 	{
-		pthread_mutex_lock(&(table->stdout_mtx));
-		printf("[!] - Launching thread %d...\n", i);
-		pthread_mutex_unlock(&(table->stdout_mtx));
+		// pthread_mutex_lock(&(table->stdout_mtx));
+		// printf("[!] - Launching thread %d...\n", i);
+		// pthread_mutex_unlock(&(table->stdout_mtx));
 		if (pthread_create(&table->philos[i].thread, NULL, philo_init, &i) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
@@ -27,9 +68,9 @@ int	launch_threads(void)
 		i++;
 	}
 	pthread_mutex_unlock(&(table->mtx));
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - Successfully launched %d threads!\n", i);
-	pthread_mutex_unlock(&(table->stdout_mtx));
+	// pthread_mutex_lock(&(table->stdout_mtx));
+	// printf("[!] - Successfully launched %d threads!\n", i);
+	// pthread_mutex_unlock(&(table->stdout_mtx));
 	return (0);
 }
 
@@ -39,7 +80,7 @@ int	wait_on_threads(void)
 	int			i;
 
 	table = get_table();
-	sfwrite_stderr("[!] - Waiting for threads to finish...\n");
+	// sfwrite_stderr("[!] - Waiting for threads to finish...\n");
 	i = 0;
 	while (i < table->philo_count)
 	{

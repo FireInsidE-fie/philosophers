@@ -55,3 +55,14 @@ size_t	ft_strlen(const char *str)
 	}
 	return (count);
 }
+
+/**
+ * @brief Returns the current time in milliseconds.
+ */
+uint64_t	get_timestamp(struct timeval timeval)
+{
+	uint64_t	timestamp;
+
+	timestamp = timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
+	return (timestamp);
+}

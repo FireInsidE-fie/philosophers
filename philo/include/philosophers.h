@@ -65,16 +65,18 @@ typedef struct s_philo
 	pthread_t		thread;
 	t_fork			*left_fork;
 	t_fork			*right_fork;
-	t_action		action;
-	struct timeval	last_change;
+	t_action		action;			// The action the philo is currently doing
+	struct timeval	last_change;	// The last time the philo changed actions
 	uint32_t		times_eaten;
-	pthread_mutex_t	mtx;
+	pthread_mutex_t	mtx;			// TODO : is this even useful?
 }	t_philo;
 
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
 	uint8_t			philo_count;
+	bool			run_simulation;		// Determines if the sim continues
+	pthread_t		waiter;				// Monitoring thread
 	pthread_mutex_t	mtx;				// Mutex for the table
 	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
 	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
@@ -89,25 +91,26 @@ typedef struct s_table
 // Functions ===================================================================
 
 // Table functions - table.c
-t_table	*get_table(void);
-int		init_table(char **argv);
-void	clean_table(void);
-int		init_mutexes(void);
-void	destroy_mutexes(void);
+t_table		*get_table(void);
+int			init_table(char **argv);
+void		clean_table(void);
+int			init_mutexes(void);
+void		destroy_mutexes(void);
 
 // Thinkers functions - thinkers.c
-void	*philo_init(void *input);
+void		*philo_init(void *input);
 
 // Threads functions - threads.c
-int		launch_threads(void);
-int		wait_on_threads(void);
+int			launch_threads(void);
+int			wait_on_threads(void);
 
 // General utils - utils.c
-int		ft_atoi(const char *str);
-size_t	ft_strlen(const char *str);
+int			ft_atoi(const char *str);
+size_t		ft_strlen(const char *str);
+uint64_t	get_timestamp(struct timeval timeval);
 
 // Mutex-locked utils - safe_utils.c
-size_t	sfwrite_stdout(char *buf);
-size_t	sfwrite_stderr(char *buf);
+size_t		sfwrite_stdout(char *buf);
+size_t		sfwrite_stderr(char *buf);
 
 #endif // PHILOSOPHERS_H

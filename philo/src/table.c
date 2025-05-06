@@ -25,6 +25,7 @@ int	init_table(char **argv)
 	table = get_table();
 	if (!table)
 		return (1);
+	table->run_simulation = true;
 	table->philo_count = ft_atoi(argv[1]);
 	table->philos = malloc(sizeof(t_philo) * table->philo_count); // Probably add 1 here to have a monitoring thread
 	if (!table->philos)
