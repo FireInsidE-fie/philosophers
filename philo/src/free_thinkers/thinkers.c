@@ -33,7 +33,7 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_unlock(&self->mtx);
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("%s%li:%li - %d is eating...%s\n", KYEL,
+	printf("%s%li:%li - %d is eating%s\n", KYEL,
 		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
 		self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
@@ -52,7 +52,7 @@ static void	philo_think(t_table *table, t_philo *self)
 {
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("%s%li:%li - %d is thinking...%s\n", KGRN,
+	printf("%s%li:%li - %d is thinking%s\n", KGRN,
 		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
 		self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
@@ -62,7 +62,7 @@ static void	philo_sleep(t_table *table, t_philo *self)
 {
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("%s%li:%li - %d is sleeping...%s\n", KBLU,
+	printf("%s%li:%li - %d is sleeping%s\n", KBLU,
 		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
 		self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
@@ -74,11 +74,11 @@ void	*philo_init(void *input)
 	t_action	state;
 	t_table		*table;
 	t_philo		*self;
+	int			id;
 
+	id = *(int *)input;
 	table = get_table();
-	// pthread_mutex_lock(&table->mtx);
-	self = &table->philos[*(int *)input];
-	// pthread_mutex_unlock(&table->mtx);
+	self = &table->philos[id];
 	pthread_mutex_lock(&self->mtx);
 	self->id = *(int *)input + 1;
 	self->times_eaten = 0;

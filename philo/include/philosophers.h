@@ -60,8 +60,8 @@ typedef struct s_philo
 {
 	uint8_t			id;
 	pthread_t		thread;
-	t_fork			*left_fork;
-	t_fork			*right_fork;
+	t_fork			*left_fork;		// TODO: Unused
+	t_fork			*right_fork;	// TODO: Unused
 	t_action		action;			// The action the philo is currently doing
 	struct timeval	last_change;	// The last time the philo changed states
 	struct timeval	last_meal;		// The time the last meal started at

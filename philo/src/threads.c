@@ -38,7 +38,7 @@ void	*monitor(void *input)
 			update_last_change(&table->philos[i]);
 			table->run_simulation = false;
 			pthread_mutex_lock(&(table->stdout_mtx));
-			printf("%s%li:%li - %d has died!%s\n", KRED,
+			printf("%s%li:%li - %d died%s\n", KRED,
 				table->philos[i].last_change.tv_sec,
 				(long)table->philos[i].last_change.tv_usec / 1000,
 				table->philos[i].id, KNRM);
@@ -65,9 +65,9 @@ int	launch_threads(void)
 	pthread_create(&table->waiter, NULL, monitor, NULL);
 	while (i < table->philo_count)
 	{
-		// pthread_mutex_lock(&(table->stdout_mtx));
-		// printf("[!] - Launching thread %d...\n", i);
-		// pthread_mutex_unlock(&(table->stdout_mtx));
+		pthread_mutex_lock(&(table->stdout_mtx));
+		printf("[!] - Launching thread %d...\n", i);
+		pthread_mutex_unlock(&(table->stdout_mtx));
 		if (pthread_create(&table->philos[i].thread, NULL, philo_init, &i) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
@@ -77,13 +77,13 @@ int	launch_threads(void)
 				pthread_join(table->philos[--i].thread, NULL);
 			return (1);
 		}
-		usleep(100);
+		usleep(1000);
 		i++;
 	}
 	pthread_mutex_unlock(&(table->mtx));
-	// pthread_mutex_lock(&(table->stdout_mtx));
-	// printf("[!] - Successfully launched %d threads!\n", i);
-	// pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - Successfully launched %d threads!\n", i);
+	pthread_mutex_unlock(&(table->stdout_mtx));
 	return (0);
 }
 
