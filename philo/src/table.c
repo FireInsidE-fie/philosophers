@@ -27,7 +27,7 @@ int	init_table(char **argv)
 		return (1);
 	table->run_simulation = true;
 	table->philo_count = ft_atoi(argv[1]);
-	table->philos = malloc(sizeof(t_philo) * table->philo_count); // Probably add 1 here to have a monitoring thread
+	table->philos = malloc(sizeof(t_philo) * table->philo_count);
 	if (!table->philos)
 		return (free(table), 1);
 	table->forks = malloc(sizeof(t_fork) * table->philo_count);

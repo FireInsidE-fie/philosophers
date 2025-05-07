@@ -3,13 +3,15 @@
 /**
  * @brief Checks if a given philosopher has taken too much time to eat.
  */
-bool has_starved(const t_philo *philo)
+bool has_starved(t_philo *philo)
 {
 	uint64_t		difference;
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
+	pthread_mutex_lock(&philo->mtx);
 	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
+	pthread_mutex_unlock(&philo->mtx);
 	// FIXME : sometimes the difference goes below 0 and launches up to billions
 	// thinking this only happens when the last meal is in a second and the current time is in another?
 	// just let the program run for a while and you'll see what I mean

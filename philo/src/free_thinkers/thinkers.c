@@ -67,9 +67,12 @@ void	*philo_init(void *input)
 
 	table = get_table();
 	self = &table->philos[*(int *)input];
+	pthread_mutex_lock(&self->mtx);
 	self->id = *(int *)input + 1;
 	self->alive = true;
 	self->times_eaten = 0;
+	gettimeofday(&self->last_meal, NULL);
+	pthread_mutex_unlock(&self->mtx);
 	// pthread_mutex_lock(&(table->stdout_mtx));
 	// printf("[!] - Creating philosopher %d...\n", self->id);
 	// pthread_mutex_unlock(&(table->stdout_mtx));
@@ -88,11 +91,13 @@ void	*philo_init(void *input)
 	}
 	if (self->alive == false)
 	{
+		pthread_mutex_lock(&self->mtx);
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("%s%li:%li - %d has died!%s\n", KRED,
 			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
 			self->id, KNRM);
 		pthread_mutex_unlock(&(table->stdout_mtx));
+		pthread_mutex_unlock(&self->mtx);
 	}
 	pthread_exit(NULL);
 }

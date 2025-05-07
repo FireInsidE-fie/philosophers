@@ -67,8 +67,8 @@ typedef struct s_philo
 	t_action		action;			// The action the philo is currently doing
 	struct timeval	last_change;	// The last time the philo changed states
 	struct timeval	last_meal;		// The time the last meal started at
+	pthread_mutex_t	mtx;
 	uint32_t		times_eaten;
-	pthread_mutex_t	mtx;			// TODO : is this even useful?
 }	t_philo;
 
 // The main struct of the program, overseeing the whole simulation.
