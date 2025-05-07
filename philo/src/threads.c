@@ -12,9 +12,6 @@ bool has_starved(t_philo *philo)
 	pthread_mutex_lock(&philo->mtx);
 	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
 	pthread_mutex_unlock(&philo->mtx);
-	// FIXME : sometimes the difference goes below 0 and launches up to billions (might be fixed)
-	// thinking this only happens when the last meal is in a second and the current time is in another?
-	// just let the program run for a while and you'll see what I mean
 	if (difference > get_table()->time_die)
 	{
 		pthread_mutex_lock(&(get_table()->stdout_mtx));

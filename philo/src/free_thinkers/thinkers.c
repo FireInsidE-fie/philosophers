@@ -22,13 +22,7 @@ void	update_last_change(t_philo *self)
 
 static void	philo_eat(t_table *table, t_philo *self)
 {
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - %u picking up left fork...\n", self->id);
-	pthread_mutex_unlock(&(table->stdout_mtx));
 	pthread_mutex_lock(&table->forks[self->id - 1].mtx);
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - %u picking up right fork...\n", self->id);
-	pthread_mutex_unlock(&(table->stdout_mtx));
 	if (self->id == table->philo_count)
 		pthread_mutex_lock(&table->forks[0].mtx);
 	else
@@ -49,9 +43,6 @@ static void	philo_eat(t_table *table, t_philo *self)
 		pthread_mutex_unlock(&table->forks[0].mtx);
 	else
 		pthread_mutex_unlock(&table->forks[self->id].mtx);
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - %u released both his forks!\n", self->id);
-	pthread_mutex_unlock(&(table->stdout_mtx));
 }
 
 /**
