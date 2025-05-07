@@ -66,7 +66,9 @@ void	*philo_init(void *input)
 	t_philo		*self;
 
 	table = get_table();
+	// pthread_mutex_lock(&table->mtx);
 	self = &table->philos[*(int *)input];
+	// pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->mtx);
 	self->id = *(int *)input + 1;
 	self->alive = true;
@@ -77,8 +79,10 @@ void	*philo_init(void *input)
 	// printf("[!] - Creating philosopher %d...\n", self->id);
 	// pthread_mutex_unlock(&(table->stdout_mtx));
 	state = 0;
+	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true) // check for number of times eaten if program was launched with according argument
 	{
+		pthread_mutex_unlock(&table->mtx);
 		if (state == THINK)
 			philo_think(table, self);
 		else if (state == EAT)
@@ -88,16 +92,18 @@ void	*philo_init(void *input)
 		state++;
 		if (state > 2)
 			state = 0;
+		pthread_mutex_lock(&table->mtx);
 	}
+	pthread_mutex_unlock(&table->mtx);
+	pthread_mutex_lock(&self->mtx);
 	if (self->alive == false)
 	{
-		pthread_mutex_lock(&self->mtx);
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("%s%li:%li - %d has died!%s\n", KRED,
 			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
 			self->id, KNRM);
 		pthread_mutex_unlock(&(table->stdout_mtx));
-		pthread_mutex_unlock(&self->mtx);
 	}
+	pthread_mutex_unlock(&self->mtx);
 	pthread_exit(NULL);
 }
