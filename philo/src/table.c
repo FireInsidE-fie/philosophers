@@ -85,9 +85,9 @@ void	destroy_mutexes(void)
 	table = get_table();
 	pthread_mutex_lock(&table->mtx);
 	if (pthread_mutex_destroy(&table->stdout_mtx) != 0)
-		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
+		printf("%s[!] - Failed to destroy mutexes (stdout)!%s\n", KRED, KNRM);
 	if (pthread_mutex_destroy(&table->stderr_mtx) != 0)
-		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
+		printf("%s[!] - Failed to destroy mutexes (stderr)!%s\n", KRED, KNRM);
 	i = 0;
 	while (i < table->philo_count)
 	{
@@ -98,6 +98,6 @@ void	destroy_mutexes(void)
 	}
 	pthread_mutex_unlock(&table->mtx);
 	if (pthread_mutex_destroy(&table->mtx) != 0)
-		printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
+		printf("%s[!] - Failed to destroy mutexes (table)!%s\n", KRED, KNRM);
 	printf("[!] - Finished destroying mutexes!\n");
 }

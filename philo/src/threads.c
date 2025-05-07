@@ -5,18 +5,20 @@
  */
 bool has_starved(t_philo *philo)
 {
+	t_table			*table;
 	uint64_t		difference;
 	struct timeval	time;
 
+	table = get_table();
 	gettimeofday(&time, NULL);
 	pthread_mutex_lock(&philo->mtx);
 	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
 	pthread_mutex_unlock(&philo->mtx);
-	if (difference > get_table()->time_die)
+	if (difference > table->time_die)
 	{
-		pthread_mutex_lock(&(get_table()->stdout_mtx));
+		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("[!] - Difference is %lu...\n", difference);
-		pthread_mutex_unlock(&(get_table()->stdout_mtx));
+		pthread_mutex_unlock(&(table->stdout_mtx));
 		return (true);
 	}
 	return (false);
@@ -37,13 +39,13 @@ void	*monitor(void *input)
 		{
 			update_last_change(&table->philos[i]);
 			table->run_simulation = false;
+			pthread_mutex_unlock(&(table->mtx));
 			pthread_mutex_lock(&(table->stdout_mtx));
 			printf("%s%li:%li - %d died%s\n", KRED,
 				table->philos[i].last_change.tv_sec,
 				(long)table->philos[i].last_change.tv_usec / 1000,
 				table->philos[i].id, KNRM);
 			pthread_mutex_unlock(&(table->stdout_mtx));
-			pthread_mutex_unlock(&(table->mtx));
 			break ;
 		}
 		pthread_mutex_unlock(&(table->mtx));
