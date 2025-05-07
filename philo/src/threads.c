@@ -12,7 +12,7 @@ bool has_starved(t_philo *philo)
 	pthread_mutex_lock(&philo->mtx);
 	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
 	pthread_mutex_unlock(&philo->mtx);
-	// FIXME : sometimes the difference goes below 0 and launches up to billions
+	// FIXME : sometimes the difference goes below 0 and launches up to billions (might be fixed)
 	// thinking this only happens when the last meal is in a second and the current time is in another?
 	// just let the program run for a while and you'll see what I mean
 	if (difference > get_table()->time_die)
@@ -40,7 +40,12 @@ void	*monitor(void *input)
 		{
 			update_last_change(&table->philos[i]);
 			table->run_simulation = false;
-			table->philos[i].alive = false;
+			pthread_mutex_lock(&(table->stdout_mtx));
+			printf("%s%li:%li - %d has died!%s\n", KRED,
+				table->philos[i].last_change.tv_sec,
+				(long)table->philos[i].last_change.tv_usec / 1000,
+				table->philos[i].id, KNRM);
+			pthread_mutex_unlock(&(table->stdout_mtx));
 			pthread_mutex_unlock(&(table->mtx));
 			break ;
 		}

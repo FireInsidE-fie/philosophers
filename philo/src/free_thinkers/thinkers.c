@@ -22,6 +22,17 @@ void	update_last_change(t_philo *self)
 
 static void	philo_eat(t_table *table, t_philo *self)
 {
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - %u picking up left fork...\n", self->id);
+	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_lock(&table->forks[self->id - 1].mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - %u picking up right fork...\n", self->id);
+	pthread_mutex_unlock(&(table->stdout_mtx));
+	if (self->id == table->philo_count)
+		pthread_mutex_lock(&table->forks[0].mtx);
+	else
+		pthread_mutex_lock(&table->forks[self->id].mtx);
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
@@ -33,6 +44,14 @@ static void	philo_eat(t_table *table, t_philo *self)
 		self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	usleep(table->time_eat * 1000);
+	pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
+	if (self->id == table->philo_count)
+		pthread_mutex_unlock(&table->forks[0].mtx);
+	else
+		pthread_mutex_unlock(&table->forks[self->id].mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - %u released both his forks!\n", self->id);
+	pthread_mutex_unlock(&(table->stdout_mtx));
 }
 
 /**
@@ -71,7 +90,6 @@ void	*philo_init(void *input)
 	// pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->mtx);
 	self->id = *(int *)input + 1;
-	self->alive = true;
 	self->times_eaten = 0;
 	gettimeofday(&self->last_meal, NULL);
 	pthread_mutex_unlock(&self->mtx);
@@ -89,21 +107,10 @@ void	*philo_init(void *input)
 			philo_eat(table, self);
 		else if (state == SLEEP)
 			philo_sleep(table, self);
-		state++;
-		if (state > 2)
+		if (++state > 2)
 			state = 0;
 		pthread_mutex_lock(&table->mtx);
 	}
 	pthread_mutex_unlock(&table->mtx);
-	pthread_mutex_lock(&self->mtx);
-	if (self->alive == false)
-	{
-		pthread_mutex_lock(&(table->stdout_mtx));
-		printf("%s%li:%li - %d has died!%s\n", KRED,
-			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-			self->id, KNRM);
-		pthread_mutex_unlock(&(table->stdout_mtx));
-	}
-	pthread_mutex_unlock(&self->mtx);
-	pthread_exit(NULL);
+	return (NULL);
 }

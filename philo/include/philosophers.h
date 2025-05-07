@@ -51,7 +51,6 @@ typedef enum e_action
 // Represents a fork and its mutex.
 typedef struct s_fork
 {
-	int8_t			status;
 	struct s_philo	*last_eater;
 	pthread_mutex_t	mtx;
 }	t_fork;
@@ -60,15 +59,14 @@ typedef struct s_fork
 typedef struct s_philo
 {
 	uint8_t			id;
-	bool			alive;
 	pthread_t		thread;
 	t_fork			*left_fork;
 	t_fork			*right_fork;
 	t_action		action;			// The action the philo is currently doing
 	struct timeval	last_change;	// The last time the philo changed states
 	struct timeval	last_meal;		// The time the last meal started at
-	pthread_mutex_t	mtx;
 	uint32_t		times_eaten;
+	pthread_mutex_t	mtx;
 }	t_philo;
 
 // The main struct of the program, overseeing the whole simulation.
@@ -77,15 +75,15 @@ typedef struct s_table
 	uint8_t			philo_count;
 	bool			run_simulation;		// Determines if the sim continues
 	pthread_t		waiter;				// Monitoring thread
-	pthread_mutex_t	mtx;				// Mutex for the table
-	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
-	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
 	uint32_t		time_die;			// Time it takes to die after eating
 	uint32_t		time_eat;			// Time it takes to eat
 	uint32_t		time_sleep;			// Time it takes to sleep
 	uint32_t		min_times_eaten;	// Number of times everyone needs to eat
 	t_philo			*philos;
 	t_fork			*forks;
+	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
+	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
+	pthread_mutex_t	mtx;				// Mutex for the table
 }	t_table;
 
 // Functions ===================================================================
