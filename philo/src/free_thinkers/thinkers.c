@@ -26,29 +26,18 @@ void	update_last_change(t_philo *self)
 
 static void	philo_eat(t_table *table, t_philo *self)
 {
-	pthread_mutex_lock(&table->forks[self->id - 1].mtx);
+	pthread_mutex_lock(&self->left_fork->mtx);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his left fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
-	if (table->run_simulation == false)
-	{
-		pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
-		return ;
-	}
-	if (self->id == table->philo_count)
-		pthread_mutex_lock(&table->forks[0].mtx);
-	else
-		pthread_mutex_lock(&table->forks[self->id].mtx);
+	pthread_mutex_lock(&self->right_fork->mtx);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his right fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	if (table->run_simulation == false)
 	{
-		pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
-		if (self->id == table->philo_count)
-			pthread_mutex_unlock(&table->forks[0].mtx);
-		else
-			pthread_mutex_unlock(&table->forks[self->id].mtx);
+		pthread_mutex_unlock(&self->left_fork->mtx);
+		pthread_mutex_unlock(&self->right_fork->mtx);
 		return ;
 	}
 	pthread_mutex_lock(&self->mtx);
@@ -58,15 +47,19 @@ static void	philo_eat(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%li:%li - %d is eating%s\n", KYEL,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
+			self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	usleep(table->time_eat * 1000);
-	pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
-	if (self->id == table->philo_count)
-		pthread_mutex_unlock(&table->forks[0].mtx);
-	else
-		pthread_mutex_unlock(&table->forks[self->id].mtx);
+	self->left_fork->last_eater = self;
+	self->right_fork->last_eater = self;
+	pthread_mutex_unlock(&self->left_fork->mtx);
+	pthread_mutex_unlock(&self->right_fork->mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - Philo %d dropped his forks!\n", self->id);
+	pthread_mutex_unlock(&(table->stdout_mtx));
+	self->times_eaten++;
+	self->action = SLEEP;
 }
 
 /**
@@ -77,9 +70,10 @@ static void	philo_think(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%li:%li - %d is thinking%s\n", KGRN,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
+			self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	self->action = EAT;
 }
 
 static void	philo_sleep(t_table *table, t_philo *self)
@@ -87,43 +81,44 @@ static void	philo_sleep(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%li:%li - %d is sleeping%s\n", KBLU,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+			self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
+			self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	usleep(table->time_sleep * 1000);
+	self->action = THINK;
 }
 
 void	*philo_init(void *input)
 {
-	t_action	state;
-	t_table		*table;
-	t_philo		*self;
-	int			id;
+	t_table *table;
+	t_philo *self;
+	int id;
 
-	id = *(int *)input;
+	id = *(int*)input;
 	table = get_table();
 	self = &table->philos[id];
 	pthread_mutex_lock(&self->mtx);
-	self->id = *(int *)input + 1;
+	self->id = *(int*)input + 1;
 	self->times_eaten = 0;
 	gettimeofday(&self->last_meal, NULL);
+	self->left_fork = &table->forks[self->id - 1];
+	if (self->id == table->philo_count)
+		self->right_fork = &table->forks[0];
+	else
+		self->right_fork = &table->forks[self->id];
 	pthread_mutex_unlock(&self->mtx);
-	// pthread_mutex_lock(&(table->stdout_mtx));
-	// printf("[!] - Creating philosopher %d...\n", self->id);
-	// pthread_mutex_unlock(&(table->stdout_mtx));
-	state = THINK;
+	self->action = THINK;
 	pthread_mutex_lock(&table->mtx);
-	while (table->run_simulation == true) // TODO check for number of times eaten if program was launched with according argument
+	// TODO check for number of times eaten if program was launched with according argument
+	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);
-		if (state == THINK)
+		if (self->action == THINK)
 			philo_think(table, self);
-		else if (state == EAT)
+		else if (self->action == EAT)
 			philo_eat(table, self);
-		else if (state == SLEEP)
+		else if (self->action == SLEEP)
 			philo_sleep(table, self);
-		if (++state > 2)
-			state = THINK;
 		pthread_mutex_lock(&table->mtx);
 	}
 	pthread_mutex_unlock(&table->mtx);
