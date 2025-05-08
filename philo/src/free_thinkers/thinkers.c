@@ -112,7 +112,9 @@ void	*philo_init(void *input)
 	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);
-		if (self->action == THINK)
+		if (table->philo_count == 1) // TODO: hardcoded fix, maybe there's a better way?
+			;
+		else if (self->action == THINK)
 			philo_think(table, self);
 		else if (self->action == EAT)
 			philo_eat(table, self);
