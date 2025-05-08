@@ -30,6 +30,11 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his left fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	if (table->run_simulation == false)
+	{
+		pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
+		return ;
+	}
 	if (self->id == table->philo_count)
 		pthread_mutex_lock(&table->forks[0].mtx);
 	else
@@ -37,6 +42,15 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his right fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	if (table->run_simulation == false)
+	{
+		pthread_mutex_unlock(&table->forks[self->id - 1].mtx);
+		if (self->id == table->philo_count)
+			pthread_mutex_unlock(&table->forks[0].mtx);
+		else
+			pthread_mutex_unlock(&table->forks[self->id].mtx);
+		return ;
+	}
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
