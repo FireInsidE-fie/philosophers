@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   thinkers.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: fireinside <aisling.fontaine@pm.me>        +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/08 19:17:25 by fireinside        #+#    #+#             */
-/*   Updated: 2025/04/29 15:56:02 by fireinside       ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philosophers.h"
 
 /**
@@ -27,10 +15,21 @@ void	update_last_change(t_philo *self)
 static void	philo_eat(t_table *table, t_philo *self)
 {
 	pthread_mutex_lock(&self->left_fork->mtx);
+	if (self->left_fork->last_eater == self)
+	{
+        pthread_mutex_unlock(&self->left_fork->mtx);
+		return ;
+	}
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his left fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->right_fork->mtx);
+	if (self->right_fork->last_eater == self)
+	{
+		pthread_mutex_unlock(&self->left_fork->mtx);
+		pthread_mutex_unlock(&self->right_fork->mtx);
+		return ;
+	}
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his right fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
