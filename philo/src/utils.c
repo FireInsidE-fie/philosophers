@@ -1,7 +1,7 @@
 #include "philosophers.h"
 
 /**
- * @brief Convers a string into its integer representation.
+ * @brief Converts a string into its integer representation.
  * This function accepts any number of white space (isspace(3)) as a suffix,
  * as well as one minus (-) or plus (-) sign.
  *

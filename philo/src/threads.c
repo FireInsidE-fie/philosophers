@@ -35,6 +35,12 @@ void	*monitor(void *input)
 	while (i < table->philo_count)
 	{
 		pthread_mutex_lock(&(table->mtx));
+		if (table->philos[i].times_eaten >= table->min_times_eaten)
+		{
+			table->run_simulation = false;
+			pthread_mutex_unlock(&(table->mtx));
+			break ;
+		}
 		if (has_starved(&table->philos[i]) == true)
 		{
 			update_last_change(&table->philos[i]);

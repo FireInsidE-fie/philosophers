@@ -36,6 +36,9 @@ int	init_table(char **argv)
 	table->time_die = ft_atoi(argv[2]);
 	table->time_eat = ft_atoi(argv[3]);
 	table->time_sleep = ft_atoi(argv[4]);
+	table->min_times_eaten = -1;
+	if (argv[5])
+		table->min_times_eaten = ft_atoi(argv[5]);
 	printf("[!] - Arguments gotten : %u - %u - %u\n", table->time_die, table->time_eat, table->time_sleep);
 	return (0);
 }
