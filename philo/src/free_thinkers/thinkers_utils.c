@@ -6,10 +6,8 @@
  */
 void	update_last_change(t_philo *self)
 {
-	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_change, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
-	pthread_mutex_unlock(&self->mtx);
 }
 
 /**

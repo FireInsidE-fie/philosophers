@@ -20,14 +20,12 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
-	pthread_mutex_unlock(&self->mtx);
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
-	pthread_mutex_lock(&self->mtx);
 	printf("%s%lu - %d is eating%s\n", KYEL,
 		get_timestamp(self->last_change, table), self->id, KNRM);
-	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_unlock(&self->mtx);
 	usleep(table->time_eat * 1000);
 	self->left_fork->last_eater = self;
 	self->right_fork->last_eater = self;
@@ -78,9 +76,22 @@ static void	philo_sleep(t_table *table, t_philo *self)
 /**
  * @brief Main philosophers loop, thinking, eating and sleeping.
  */
-void	philo_run(t_table *table, t_philo *self)
+void	*philo_run(void *input)
 {
+	t_table		*table;
+	t_philo		*self;
+	static int	id;
+
+	(void)input;
+	table = get_table();
+	pthread_mutex_lock(&table->index_mtx);
+	self = &table->philos[id];
+	id++;
+	pthread_mutex_lock(&self->mtx);
+	self->id = id;
+	pthread_mutex_unlock(&table->index_mtx);
 	self->action = EAT;
+	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true)
 	{
@@ -96,41 +107,31 @@ void	philo_run(t_table *table, t_philo *self)
 		pthread_mutex_lock(&table->mtx);
 	}
 	pthread_mutex_unlock(&table->mtx);
+	return (NULL);
 }
 
 // TODO : better logic to pick up forks (even and uneven stuff, look it up)
 /**
- * @brief Initializes a new thread as a philosopher. Sets up its struct and
- * launches the main loop.
+ * @brief Initializes all the philosophers structs.
  *
- * @param input Input passed down from pthreads_create, expected to be NULL.
  * @return NULL
  */
-void	*philo_init(void *input)
+void	philos_init(void)
 {
+	uint32_t	i;
 	t_table		*table;
-	t_philo		*self;
-	static int	id;
 
-	(void)input;
+	i = 0;
 	table = get_table();
-	pthread_mutex_lock(&table->index_mtx);
-	self = &table->philos[id];
-	id++;
-	pthread_mutex_lock(&self->mtx);
-	self->id = id;
-	pthread_mutex_unlock(&table->index_mtx);
-	self->times_eaten = 0;
-	self->last_meal = table->start;
-	self->left_fork = &table->forks[self->id - 1];
-	if (self->id == table->philo_count)
-		self->right_fork = &table->forks[0];
-	else
-		self->right_fork = &table->forks[self->id];
-	pthread_mutex_unlock(&self->mtx);
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - Philo %d is born!\n", self->id);
-	pthread_mutex_unlock(&(table->stdout_mtx));
-	philo_run(table, self);
-	return (NULL);
+	while (i < table->philo_count)
+	{
+		table = get_table();
+		table->philos[i].times_eaten = 0;
+		table->philos[i].last_meal = table->start;
+		table->philos[i].left_fork = &table->forks[i];
+		table->philos[i].right_fork = &table->forks[(i + 1) % table->philo_count];
+		printf("[!] - Philo %d has left fork %d and right fork %d\n", i, i, (i + 1) % table->philo_count);
+		i++;
+	}
+	printf("[!] - Philosophers initialized!\n");
 }
