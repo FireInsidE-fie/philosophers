@@ -12,6 +12,10 @@ void	update_last_change(t_philo *self)
 	pthread_mutex_unlock(&self->mtx);
 }
 
+/**
+ * @brief Makes a philosopher eat by making him pick up his two forks
+ * (mutexes) and waiting for `time_eat` milliseconds.
+ */
 static void	philo_eat(t_table *table, t_philo *self)
 {
 	pthread_mutex_lock(&self->left_fork->mtx);
@@ -33,12 +37,15 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d picked up his right fork!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_lock(&table->mtx);
 	if (table->run_simulation == false)
 	{
+		pthread_mutex_unlock(&table->mtx);
 		pthread_mutex_unlock(&self->left_fork->mtx);
 		pthread_mutex_unlock(&self->right_fork->mtx);
 		return ;
 	}
+	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
@@ -57,12 +64,16 @@ static void	philo_eat(t_table *table, t_philo *self)
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d dropped his forks!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_lock(&self->mtx);
 	self->times_eaten++;
 	self->action = SLEEP;
+	pthread_mutex_unlock(&self->mtx);
 }
 
 /**
  * @brief Philosophers think while they are waiting for forks.
+ * This just writes the log message for thinking before transitioning to
+ * EATing.
  */
 static void	philo_think(t_table *table, t_philo *self)
 {
@@ -75,6 +86,9 @@ static void	philo_think(t_table *table, t_philo *self)
 	self->action = EAT;
 }
 
+/**
+ * @brief After eating, a philosopher sleeps for `time_sleep` milliseconds.
+ */
 static void	philo_sleep(t_table *table, t_philo *self)
 {
 	update_last_change(self);
@@ -87,7 +101,37 @@ static void	philo_sleep(t_table *table, t_philo *self)
 	self->action = THINK;
 }
 
+/**
+ * @brief Main philosophers loop, thinking, eating and sleeping.
+ */
+void	philo_run(t_table *table, t_philo *self)
+{
+	self->action = THINK;
+	pthread_mutex_lock(&table->mtx);
+	while (table->run_simulation == true)
+	{
+		pthread_mutex_unlock(&table->mtx);
+		if (table->philo_count == 1) // TODO: hardcoded fix, maybe there's a better way?
+			;
+		else if (self->action == THINK)
+			philo_think(table, self);
+		else if (self->action == EAT)
+			philo_eat(table, self);
+		else if (self->action == SLEEP)
+			philo_sleep(table, self);
+		pthread_mutex_lock(&table->mtx);
+	}
+	pthread_mutex_unlock(&table->mtx);
+}
+
 // TODO : better logic to pick up forks (even and uneven stuff, look it up(
+/**
+ * @brief Initializes a new thread as a philosopher. Sets up its struct and
+ * launches the main loop.
+ *
+ * @param input Input passed down from pthreads_create, expected to be NULL.
+ * @return NULL
+ */
 void	*philo_init(void *input)
 {
 	t_table *table;
@@ -113,21 +157,6 @@ void	*philo_init(void *input)
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("[!] - Philo %d is born!\n", self->id);
 	pthread_mutex_unlock(&(table->stdout_mtx));
-	self->action = THINK;
-	pthread_mutex_lock(&table->mtx);
-	while (table->run_simulation == true)
-	{
-		pthread_mutex_unlock(&table->mtx);
-		if (table->philo_count == 1) // TODO: hardcoded fix, maybe there's a better way?
-			;
-		else if (self->action == THINK)
-			philo_think(table, self);
-		else if (self->action == EAT)
-			philo_eat(table, self);
-		else if (self->action == SLEEP)
-			philo_sleep(table, self);
-		pthread_mutex_lock(&table->mtx);
-	}
-	pthread_mutex_unlock(&table->mtx);
+	philo_run(table, self);
 	return (NULL);
 }

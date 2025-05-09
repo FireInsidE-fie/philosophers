@@ -24,6 +24,12 @@ bool has_starved(t_philo *philo)
 	return (false);
 }
 
+/**
+ * @brief A function that is called when creating the monitor thread.
+ * Looks at all the philosophers to check if someone died or if everyone
+ * eat enough. In both cases, it calls for the end of the simulation by
+ * setting `run_simulation` to `false`.
+ */
 void	*monitor(void *input)
 {
 	t_table	*table;
