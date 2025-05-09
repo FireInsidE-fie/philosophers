@@ -37,18 +37,22 @@ void	*monitor(void *input)
 	while (i < table->philo_count)
 	{
 		pthread_mutex_lock(&(table->mtx));
+		pthread_mutex_lock(&(table->philos[i].mtx));
 		if (table->philos[i].times_eaten < table->min_times_eaten)
 			all_eaten_enough = false;
+		pthread_mutex_unlock(&(table->philos[i].mtx));
 		if (has_starved(&table->philos[i]) == true)
 		{
 			update_last_change(&table->philos[i]);
 			table->run_simulation = false;
 			pthread_mutex_unlock(&(table->mtx));
 			pthread_mutex_lock(&(table->stdout_mtx));
+			pthread_mutex_lock(&(table->philos[i].mtx));
 			printf("%s%li:%li - %d died%s\n", KRED,
 				table->philos[i].last_change.tv_sec,
 				(long)table->philos[i].last_change.tv_usec / 1000,
 				table->philos[i].id, KNRM);
+			pthread_mutex_unlock(&(table->philos[i].mtx));
 			pthread_mutex_unlock(&(table->stdout_mtx));
 			break ;
 		}
@@ -84,7 +88,7 @@ int	launch_threads(void)
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("[!] - Launching thread %d...\n", i);
 		pthread_mutex_unlock(&(table->stdout_mtx));
-		if (pthread_create(&table->philos[i].thread, NULL, philo_init, &i) != 0)
+		if (pthread_create(&table->philos[i].thread, NULL, philo_init, NULL) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
 			sfwrite_stderr("[!] - Failed to create a thread!\n");

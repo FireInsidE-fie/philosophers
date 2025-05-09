@@ -71,8 +71,11 @@ typedef struct s_table
 	t_fork			*forks;
 	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
 	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
+	pthread_mutex_t	index_mtx;			// Mutex for philosophers' indexes
 	pthread_mutex_t	mtx;				// Mutex for the table
 }	t_table;
+
+// TODO : find a better name / use for index_mtx
 
 // Functions ===================================================================
 

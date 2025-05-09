@@ -87,17 +87,21 @@ static void	philo_sleep(t_table *table, t_philo *self)
 	self->action = THINK;
 }
 
+// TODO : better logic to pick up forks (even and uneven stuff, look it up(
 void	*philo_init(void *input)
 {
 	t_table *table;
 	t_philo *self;
-	int id;
+	static int id;
 
-	id = *(int*)input;
+	(void)input;
 	table = get_table();
+	pthread_mutex_lock(&table->index_mtx);
 	self = &table->philos[id];
+	id++;
 	pthread_mutex_lock(&self->mtx);
-	self->id = *(int*)input + 1;
+	self->id = id;
+	pthread_mutex_unlock(&table->index_mtx);
 	self->times_eaten = 0;
 	gettimeofday(&self->last_meal, NULL);
 	self->left_fork = &table->forks[self->id - 1];
@@ -106,6 +110,9 @@ void	*philo_init(void *input)
 	else
 		self->right_fork = &table->forks[self->id];
 	pthread_mutex_unlock(&self->mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
+	printf("[!] - Philo %d is born!\n", self->id);
+	pthread_mutex_unlock(&(table->stdout_mtx));
 	self->action = THINK;
 	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true)

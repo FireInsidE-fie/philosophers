@@ -18,9 +18,14 @@ t_table	*get_table(void)
 	return (table);
 }
 
+/**
+ * @note Initializes `min_times_eaten` to -1 to put the unsigned integer to
+ * its maximum value. This effectively negates the min_times_eaten limit.
+ */
 int	init_table(char **argv)
 {
 	t_table	*table;
+	int		i;
 
 	table = get_table();
 	if (!table)
@@ -33,13 +38,15 @@ int	init_table(char **argv)
 	table->forks = malloc(sizeof(t_fork) * table->philo_count);
 	if (!table->forks)
 		return (free(table->philos), free(table), 1);
+	i = 0;
+	while (i < table->philo_count)
+		table->forks[i++].last_eater = NULL;
 	table->time_die = ft_atoi(argv[2]);
 	table->time_eat = ft_atoi(argv[3]);
 	table->time_sleep = ft_atoi(argv[4]);
 	table->min_times_eaten = -1;
 	if (argv[5])
 		table->min_times_eaten = ft_atoi(argv[5]);
-	printf("[!] - Arguments gotten : %u - %u - %u\n", table->time_die, table->time_eat, table->time_sleep);
 	return (0);
 }
 
@@ -75,6 +82,7 @@ int	init_mutexes(void)
 				destroy_mutexes(), -1);
 		i++;
 	}
+	pthread_mutex_init(&table->index_mtx, NULL);
 	printf("[!] - Successfully initialized mutexes!\n");
 	return (0);
 }
@@ -99,6 +107,7 @@ void	destroy_mutexes(void)
 			printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 		i++;
 	}
+	pthread_mutex_destroy(&table->index_mtx);
 	pthread_mutex_unlock(&table->mtx);
 	if (pthread_mutex_destroy(&table->mtx) != 0)
 		printf("%s[!] - Failed to destroy mutexes (table)!%s\n", KRED, KNRM);
