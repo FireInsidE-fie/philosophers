@@ -87,8 +87,11 @@ int			init_mutexes(void);
 void		destroy_mutexes(void);
 
 // Thinkers functions - thinkers.c
-void		update_last_change(t_philo *self);
 void		*philo_init(void *input);
+
+// Thinkers utils functions - thinkers_utils.c
+void		update_last_change(t_philo *self);
+int			pickup_forks(t_table *table, t_philo *self);
 
 // Threads functions - threads.c
 int			launch_threads(void);

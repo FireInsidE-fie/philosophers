@@ -31,11 +31,11 @@ int	main(const int argc, char **argv)
 
 	if (argc < 5 || argc > 6)
 		return (printf("[!] - Usage: ./philosophers number_of_philosophers "
-				 "time_to_die time_to_eat time_to_sleep"
-				 " [number_of_times_each_philosopher_must_eat]"), 1);
+				"time_to_die time_to_eat time_to_sleep"
+				" [number_of_times_each_philosopher_must_eat]"), 1);
 	if (check_input(argc, argv) == 1)
 		return (printf("[!] - Please only provide positive"
-				 " integers as arguments.\n"), 1);
+				" integers as arguments.\n"), 1);
 	if (init_table(argv) == 1)
 		return (1);
 	table = get_table();
