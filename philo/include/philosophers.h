@@ -62,6 +62,7 @@ typedef struct s_table
 {
 	uint8_t			philo_count;
 	bool			run_simulation;		// Determines if the sim continues
+	struct timeval	start;				// The time at which the sim started
 	pthread_t		waiter;				// Monitoring thread
 	uint32_t		time_die;			// Time it takes to die after eating
 	uint32_t		time_eat;			// Time it takes to eat
@@ -100,7 +101,7 @@ int			wait_on_threads(void);
 // General utils - utils.c
 int			ft_atoi(const char *str);
 size_t		ft_strlen(const char *str);
-uint64_t	get_timestamp(struct timeval timeval);
+uint64_t	get_timestamp(const struct timeval time, const t_table* table);
 
 // Mutex-locked utils - safe_utils.c
 size_t		sfwrite_stdout(char *buf);

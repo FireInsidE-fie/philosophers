@@ -15,7 +15,7 @@ void	update_last_change(t_philo *self)
 /**
  * @brief Pick up both the left and right forks of a philosopher.
  *
- * @return 0 if everything can proceeed, -1 if a fork was last picked up
+ * @return 0 if everything can proceed, -1 if a fork was last picked up
  * by self, meaning we have to let someone else take it.
  */
 int pickup_forks(t_table *table, t_philo *self)

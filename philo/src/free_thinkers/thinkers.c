@@ -24,9 +24,8 @@ static void	philo_eat(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->mtx);
-	printf("%s%li:%li - %d is eating%s\n", KYEL,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+	printf("%s%lu - %d is eating%s\n", KYEL,
+		get_timestamp(self->last_change, table), self->id, KNRM);
 	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	usleep(table->time_eat * 1000);
@@ -53,9 +52,8 @@ static void	philo_think(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->mtx);
-	printf("%s%li:%li - %d is thinking%s\n", KGRN,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+	printf("%s%lu - %d is thinking%s\n", KGRN,
+		get_timestamp(self->last_change, table), self->id, KNRM);
 	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	self->action = EAT;
@@ -69,9 +67,8 @@ static void	philo_sleep(t_table *table, t_philo *self)
 	update_last_change(self);
 	pthread_mutex_lock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->mtx);
-	printf("%s%li:%li - %d is sleeping%s\n", KBLU,
-		self->last_change.tv_sec, (long)self->last_change.tv_usec / 1000,
-		self->id, KNRM);
+	printf("%s%lu - %d is sleeping%s\n", KBLU,
+		get_timestamp(self->last_change, table), self->id, KNRM);
 	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
 	usleep(table->time_sleep * 1000);
@@ -83,7 +80,7 @@ static void	philo_sleep(t_table *table, t_philo *self)
  */
 void	philo_run(t_table *table, t_philo *self)
 {
-	self->action = THINK;
+	self->action = EAT;
 	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true)
 	{
@@ -124,7 +121,7 @@ void	*philo_init(void *input)
 	self->id = id;
 	pthread_mutex_unlock(&table->index_mtx);
 	self->times_eaten = 0;
-	gettimeofday(&self->last_meal, NULL);
+	self->last_meal = table->start;
 	self->left_fork = &table->forks[self->id - 1];
 	if (self->id == table->philo_count)
 		self->right_fork = &table->forks[0];

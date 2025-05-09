@@ -45,12 +45,14 @@ size_t	ft_strlen(const char *str)
 }
 
 /**
- * @brief Returns the current time in milliseconds.
+ * @brief Returns the current time in milliseconds since the simulation
+ * started.
  */
-uint64_t	get_timestamp(struct timeval timeval)
+uint64_t	get_timestamp(const struct timeval time, const t_table* table)
 {
 	uint64_t	timestamp;
 
-	timestamp = timeval.tv_sec * 1000 + timeval.tv_usec / 1000;
+	timestamp = time.tv_sec * 1000 + time.tv_usec / 1000
+		- (table->start.tv_sec * 1000 + table->start.tv_usec / 1000);
 	return (timestamp);
 }

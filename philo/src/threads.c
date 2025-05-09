@@ -12,7 +12,7 @@ bool has_starved(t_philo *philo)
 	table = get_table();
 	gettimeofday(&time, NULL);
 	pthread_mutex_lock(&philo->mtx);
-	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
+	difference = get_timestamp(time, table) - get_timestamp(philo->last_meal, table);
 	pthread_mutex_unlock(&philo->mtx);
 	if (difference >= table->time_die)
 	{
@@ -40,6 +40,7 @@ void	*monitor(void *input)
 	table = get_table();
 	i = 0;
 	all_eaten_enough = true;
+	gettimeofday(&table->start, NULL);
 	while (i < table->philo_count)
 	{
 		pthread_mutex_lock(&(table->mtx));
@@ -54,10 +55,9 @@ void	*monitor(void *input)
 			pthread_mutex_unlock(&(table->mtx));
 			pthread_mutex_lock(&(table->stdout_mtx));
 			pthread_mutex_lock(&(table->philos[i].mtx));
-			printf("%s%li:%li - %d died%s\n", KRED,
-				table->philos[i].last_change.tv_sec,
-				(long)table->philos[i].last_change.tv_usec / 1000,
-				table->philos[i].id, KNRM);
+			printf("%s%lu - %d died%s\n", KRED,
+				get_timestamp(table->philos[i].last_change, table),
+				i, KNRM);
 			pthread_mutex_unlock(&(table->philos[i].mtx));
 			pthread_mutex_unlock(&(table->stdout_mtx));
 			break ;
