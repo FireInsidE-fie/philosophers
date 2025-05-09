@@ -108,7 +108,6 @@ void	*philo_init(void *input)
 	pthread_mutex_unlock(&self->mtx);
 	self->action = THINK;
 	pthread_mutex_lock(&table->mtx);
-	// TODO check for number of times eaten if program was launched with according argument
 	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);

@@ -28,19 +28,17 @@ void	*monitor(void *input)
 {
 	t_table	*table;
 	int		i;
+	bool	all_eaten_enough;
 
 	(void)input;
 	table = get_table();
 	i = 0;
+	all_eaten_enough = true;
 	while (i < table->philo_count)
 	{
 		pthread_mutex_lock(&(table->mtx));
-		if (table->philos[i].times_eaten >= table->min_times_eaten)
-		{
-			table->run_simulation = false;
-			pthread_mutex_unlock(&(table->mtx));
-			break ;
-		}
+		if (table->philos[i].times_eaten < table->min_times_eaten)
+			all_eaten_enough = false;
 		if (has_starved(&table->philos[i]) == true)
 		{
 			update_last_change(&table->philos[i]);
@@ -57,7 +55,17 @@ void	*monitor(void *input)
 		pthread_mutex_unlock(&(table->mtx));
 		i++;
 		if (i == table->philo_count)
+		{
+			if (all_eaten_enough == true)
+			{
+				pthread_mutex_lock(&(table->mtx));
+				table->run_simulation = false;
+				pthread_mutex_unlock(&(table->mtx));
+				break ;
+			}
 			i = 0; // infinite loop
+			all_eaten_enough = true;
+		}
 	}
 	return (NULL);
 }
