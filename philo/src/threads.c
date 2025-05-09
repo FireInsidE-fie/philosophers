@@ -14,7 +14,7 @@ bool has_starved(t_philo *philo)
 	pthread_mutex_lock(&philo->mtx);
 	difference = get_timestamp(time) - get_timestamp(philo->last_meal);
 	pthread_mutex_unlock(&philo->mtx);
-	if (difference > table->time_die)
+	if (difference >= table->time_die)
 	{
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("[!] - Difference is %lu...\n", difference);
