@@ -93,7 +93,8 @@ void		philos_init(void);
 
 // Thinkers utils functions - thinkers_utils.c
 void		update_last_change(t_philo *self);
-int			pickup_forks(t_table *table, t_philo *self);
+int			pickup_forks_even(t_table *table, t_philo *self);
+int			pickup_forks_uneven(t_table *table, t_philo *self);
 
 // Threads functions - threads.c
 int			launch_threads(void);

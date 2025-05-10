@@ -6,7 +6,11 @@
  */
 static void	philo_eat(t_table *table, t_philo *self)
 {
-	if (pickup_forks(table, self) == -1)
+	if (self->id % 2 == 0 && pickup_forks_even(table, self) == -1
+		&& usleep(1000))
+		return ;
+	if (self->id % 2 != 0 && pickup_forks_uneven(table, self) == -1
+		&& usleep(1000))
 		return ;
 	pthread_mutex_lock(&table->mtx);
 	if (table->run_simulation == false)
@@ -48,12 +52,12 @@ static void	philo_eat(t_table *table, t_philo *self)
 static void	philo_think(t_table *table, t_philo *self)
 {
 	update_last_change(self);
-	pthread_mutex_lock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%lu - %d is thinking%s\n", KGRN,
 		get_timestamp(self->last_change, table), self->id, KNRM);
-	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_unlock(&self->mtx);
 	self->action = EAT;
 }
 
@@ -63,12 +67,12 @@ static void	philo_think(t_table *table, t_philo *self)
 static void	philo_sleep(t_table *table, t_philo *self)
 {
 	update_last_change(self);
-	pthread_mutex_lock(&(table->stdout_mtx));
 	pthread_mutex_lock(&self->mtx);
+	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%lu - %d is sleeping%s\n", KBLU,
 		get_timestamp(self->last_change, table), self->id, KNRM);
-	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	pthread_mutex_unlock(&self->mtx);
 	usleep(table->time_sleep * 1000);
 	self->action = THINK;
 }
@@ -110,7 +114,6 @@ void	*philo_run(void *input)
 	return (NULL);
 }
 
-// TODO : better logic to pick up forks (even and uneven stuff, look it up)
 /**
  * @brief Initializes all the philosophers structs.
  *

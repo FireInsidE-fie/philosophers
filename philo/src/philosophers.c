@@ -25,8 +25,6 @@ static int	check_input(int argc, char **argv)
 	return (0);
 }
 
-// TODO : when 2 philosophers deadlock each other by picking up the left forks
-// at the same time, it says "0 died" and the program itself deadlocks and doesn't exit.
 int	main(const int argc, char **argv)
 {
 	t_table	*table;
