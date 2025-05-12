@@ -6,10 +6,10 @@
  */
 static void	philo_eat(t_table *table, t_philo *self)
 {
-	if (self->id % 2 == 0 && pickup_forks_even(table, self) == -1
+	if (self->id % 2 == 0 && pickup_forks_even(self) == -1
 		&& usleep(1000) == 0)
 		return ;
-	if (self->id % 2 != 0 && pickup_forks_uneven(table, self) == -1
+	if (self->id % 2 != 0 && pickup_forks_uneven(self) == -1
 		&& usleep(1000) == 0)
 		return ;
 	pthread_mutex_lock(&table->mtx);
@@ -81,21 +81,18 @@ void	*philo_run(void *input)
 	t_philo		*self;
 	static int	id;
 
-	(void)input;
 	table = get_table();
 	pthread_mutex_lock(&table->index_mtx);
-	self = &table->philos[id];
-	id++;
+	self = &table->philos[id++];
 	pthread_mutex_lock(&self->mtx);
 	self->id = id;
 	pthread_mutex_unlock(&table->index_mtx);
-	self->action = EAT;
 	pthread_mutex_unlock(&self->mtx);
 	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);
-		if (table->philo_count == 1) // TODO: hardcoded fix, maybe there's a better way?
+		if (table->philo_count == 1)
 			;
 		else if (self->action == THINK)
 			philo_think(table, self);
@@ -105,8 +102,7 @@ void	*philo_run(void *input)
 			philo_sleep(table, self);
 		pthread_mutex_lock(&table->mtx);
 	}
-	pthread_mutex_unlock(&table->mtx);
-	return (NULL);
+	return (pthread_mutex_unlock(&table->mtx), input);
 }
 
 /**
@@ -128,8 +124,6 @@ void	philos_init(void)
 		table->philos[i].last_meal = table->start;
 		table->philos[i].left_fork = &table->forks[i];
 		table->philos[i].right_fork = &table->forks[(i + 1) % table->philo_count];
-		printf("[!] - Philo %d has left fork %d and right fork %d\n", i, i, (i + 1) % table->philo_count);
 		i++;
 	}
-	printf("[!] - Philosophers initialized!\n");
 }

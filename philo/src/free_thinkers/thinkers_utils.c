@@ -17,7 +17,7 @@ void	update_last_change(t_philo *self)
  * @return 0 if everything can proceed, -1 if a fork was last picked up
  * by self, meaning we have to let someone else take it.
  */
-int pickup_forks_even(t_table *table, t_philo *self)
+int	pickup_forks_even(t_philo *self)
 {
 	pthread_mutex_lock(&self->left_fork->last_eater_mtx);
 	if (self->left_fork->last_eater == self)
@@ -26,9 +26,6 @@ int pickup_forks_even(t_table *table, t_philo *self)
 		return (-1);
 	}
 	pthread_mutex_lock(&self->left_fork->mtx);
-	pthread_mutex_lock(&table->stdout_mtx);
-	printf("[!] - Philo %d picked up his left fork!\n", self->id);
-	pthread_mutex_unlock(&table->stdout_mtx);
 	pthread_mutex_lock(&self->right_fork->last_eater_mtx);
 	if (self->right_fork->last_eater == self)
 	{
@@ -38,9 +35,6 @@ int pickup_forks_even(t_table *table, t_philo *self)
 		return (-1);
 	}
 	pthread_mutex_lock(&self->right_fork->mtx);
-	pthread_mutex_lock(&table->stdout_mtx);
-	printf("[!] - Philo %d picked up his right fork!\n", self->id);
-	pthread_mutex_unlock(&table->stdout_mtx);
 	return (0);
 }
 
@@ -51,7 +45,7 @@ int pickup_forks_even(t_table *table, t_philo *self)
  * @return 0 if everything can proceed, -1 if a fork was last picked up
  * by self, meaning we have to let someone else take it.
  */
-int	pickup_forks_uneven(t_table *table, t_philo *self)
+int	pickup_forks_uneven(t_philo *self)
 {
 	pthread_mutex_lock(&self->right_fork->last_eater_mtx);
 	if (self->right_fork->last_eater == self)
@@ -60,9 +54,6 @@ int	pickup_forks_uneven(t_table *table, t_philo *self)
 		return (-1);
 	}
 	pthread_mutex_lock(&self->right_fork->mtx);
-	pthread_mutex_lock(&table->stdout_mtx);
-	printf("[!] - Philo %d picked up his right fork!\n", self->id);
-	pthread_mutex_unlock(&table->stdout_mtx);
 	pthread_mutex_lock(&self->left_fork->last_eater_mtx);
 	if (self->left_fork->last_eater == self)
 	{
@@ -72,9 +63,6 @@ int	pickup_forks_uneven(t_table *table, t_philo *self)
 		return (-1);
 	}
 	pthread_mutex_lock(&self->left_fork->mtx);
-	pthread_mutex_lock(&table->stdout_mtx);
-	printf("[!] - Philo %d picked up his left fork!\n", self->id);
-	pthread_mutex_unlock(&table->stdout_mtx);
 	return (0);
 }
 
@@ -84,7 +72,4 @@ void	drop_forks(const t_philo *self)
 	pthread_mutex_unlock(&self->right_fork->mtx);
 	pthread_mutex_unlock(&self->left_fork->last_eater_mtx);
 	pthread_mutex_unlock(&self->right_fork->last_eater_mtx);
-	pthread_mutex_lock(&(get_table()->stdout_mtx));
-	printf("[!] - Philo %d dropped his forks!\n", self->id);
-	pthread_mutex_unlock(&(get_table()->stdout_mtx));
 }

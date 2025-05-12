@@ -44,6 +44,25 @@ size_t	ft_strlen(const char *str)
 	return (count);
 }
 
+void	ft_memset(void *mem, size_t size)
+{
+	while (size--)
+		*(char *)(mem++) = 0;
+}
+
+void	*ft_calloc(size_t number, size_t size)
+{
+	size_t	full_size;
+	void	*new_mem;
+
+	full_size = number * size;
+	new_mem = malloc(full_size);
+	if (!new_mem)
+		return (NULL);
+	ft_memset(new_mem, full_size);
+	return (new_mem);
+}
+
 /**
  * @brief Returns the current time in milliseconds since the simulation
  * started.

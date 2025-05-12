@@ -17,6 +17,15 @@ bool has_starved(t_philo *philo)
 		pthread_mutex_lock(&(table->stdout_mtx));
 		printf("[!] - Difference is %lu...\n", difference);
 		pthread_mutex_unlock(&(table->stdout_mtx));
+		update_last_change(philo);
+		pthread_mutex_lock(&table->mtx);
+		table->run_simulation = false;
+		pthread_mutex_unlock(&table->mtx);
+		pthread_mutex_lock(&table->stdout_mtx);
+		printf("%s%lu - %d died%s\n", KRED,
+			get_timestamp(philo->last_change, table), philo->id, KNRM);
+		pthread_mutex_unlock(&table->stdout_mtx);
+		pthread_mutex_unlock(&philo->mtx);
 		return (true);
 	}
 	return (false);
@@ -34,47 +43,34 @@ void	*monitor(void *input)
 	int		i;
 	bool	all_eaten_enough;
 
-	(void)input;
 	table = get_table();
 	i = 0;
 	all_eaten_enough = true;
 	while (i < table->philo_count)
 	{
-		pthread_mutex_lock(&(table->philos[i].mtx));
-		pthread_mutex_lock(&(table->mtx));
-		if (table->philos[i].times_eaten < table->min_times_eaten)
+		pthread_mutex_lock(&table->philos[i].mtx);
+		pthread_mutex_lock(&table->mtx);
+		if (all_eaten_enough == true
+			&& table->philos[i].times_eaten < table->min_times_eaten)
 			all_eaten_enough = false;
-		pthread_mutex_unlock(&(table->mtx));
+		pthread_mutex_unlock(&table->mtx);
 		if (has_starved(&table->philos[i]) == true)
-		{
-			update_last_change(&table->philos[i]);
-			pthread_mutex_lock(&(table->mtx));
-			table->run_simulation = false;
-			pthread_mutex_unlock(&(table->mtx));
-			pthread_mutex_lock(&(table->stdout_mtx));
-			printf("%s%lu - %d died%s\n", KRED,
-				get_timestamp(table->philos[i].last_change, table),
-				i + 1, KNRM);
-			pthread_mutex_unlock(&(table->stdout_mtx));
-			pthread_mutex_unlock(&(table->philos[i].mtx));
-			break ;
-		}
-		pthread_mutex_unlock(&(table->philos[i].mtx));
+			return (input);
+		pthread_mutex_unlock(&table->philos[i].mtx);
 		i++;
 		if (i == table->philo_count)
 		{
 			if (all_eaten_enough == true)
 			{
-				pthread_mutex_lock(&(table->mtx));
+				pthread_mutex_lock(&table->mtx);
 				table->run_simulation = false;
-				pthread_mutex_unlock(&(table->mtx));
-				break ;
+				return (pthread_mutex_unlock(&table->mtx), input);
 			}
 			i = 0; // infinite loop
 			all_eaten_enough = true;
 		}
 	}
-	return (NULL);
+	return (input);
 }
 
 int	launch_threads(void)
@@ -90,14 +86,10 @@ int	launch_threads(void)
 	pthread_create(&table->waiter, NULL, monitor, NULL);
 	while (i < table->philo_count)
 	{
-		pthread_mutex_lock(&(table->stdout_mtx));
-		printf("[!] - Launching thread %d...\n", i);
-		pthread_mutex_unlock(&(table->stdout_mtx));
 		if (pthread_create(&table->philos[i].thread, NULL, philo_run, NULL) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
-			sfwrite_stderr("[!] - Failed to create a thread!\n");
-			sfwrite_stderr("[!] - Attempting to wait for created threads...\n");
+			printf("%s[!] - Launching thread %d...%s\n", KRED, i, KNRM);
 			while (i >= 0)
 				pthread_join(table->philos[--i].thread, NULL);
 			return (1);
@@ -106,9 +98,6 @@ int	launch_threads(void)
 		i++;
 	}
 	pthread_mutex_unlock(&(table->mtx));
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - Successfully launched %d threads!\n", i);
-	pthread_mutex_unlock(&(table->stdout_mtx));
 	return (0);
 }
 

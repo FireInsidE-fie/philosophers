@@ -29,8 +29,8 @@
 // Enums =======================================================================
 typedef enum e_action
 {
-	THINK,
 	EAT,
+	THINK,
 	SLEEP
 }	t_action;
 
@@ -92,8 +92,8 @@ void		philos_init(void);
 
 // Thinkers utils functions - thinkers_utils.c
 void		update_last_change(t_philo *self);
-int			pickup_forks_even(t_table *table, t_philo *self);
-int			pickup_forks_uneven(t_table *table, t_philo *self);
+int			pickup_forks_even(t_philo *self);
+int			pickup_forks_uneven(t_philo *self);
 void		drop_forks(const t_philo *self);
 
 // Threads functions - threads.c
@@ -104,6 +104,8 @@ int			wait_on_threads(void);
 int			ft_atoi(const char *str);
 size_t		ft_strlen(const char *str);
 uint64_t	get_timestamp(const struct timeval time, const t_table* table);
+void		ft_memset(void *mem, size_t size);
+void		*ft_calloc(size_t number, size_t size);
 
 // Mutex-locked utils - safe_utils.c
 size_t		sfwrite_stdout(char *buf);

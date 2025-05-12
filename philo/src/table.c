@@ -32,7 +32,7 @@ int	init_table(char **argv)
 		return (1);
 	table->run_simulation = true;
 	table->philo_count = ft_atoi(argv[1]);
-	table->philos = malloc(sizeof(t_philo) * table->philo_count);
+	table->philos = ft_calloc(table->philo_count, sizeof(t_philo));
 	if (!table->philos)
 		return (free(table), 1);
 	table->forks = malloc(sizeof(t_fork) * table->philo_count);
