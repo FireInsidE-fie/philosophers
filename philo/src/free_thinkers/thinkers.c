@@ -7,24 +7,23 @@
 static void	philo_eat(t_table *table, t_philo *self)
 {
 	if (self->id % 2 == 0 && pickup_forks_even(table, self) == -1
-		&& usleep(1000))
+		&& usleep(1000) == 0)
 		return ;
 	if (self->id % 2 != 0 && pickup_forks_uneven(table, self) == -1
-		&& usleep(1000))
+		&& usleep(1000) == 0)
 		return ;
 	pthread_mutex_lock(&table->mtx);
 	if (table->run_simulation == false)
 	{
 		pthread_mutex_unlock(&table->mtx);
-		pthread_mutex_unlock(&self->left_fork->mtx);
-		pthread_mutex_unlock(&self->right_fork->mtx);
+		drop_forks(self);
 		return ;
 	}
 	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
 		sfwrite_stderr("[!] - Failed to get time of day!\n");
-	update_last_change(self);
+	self->last_change = self->last_meal;
 	pthread_mutex_lock(&(table->stdout_mtx));
 	printf("%s%lu - %d is eating%s\n", KYEL,
 		get_timestamp(self->last_change, table), self->id, KNRM);
@@ -33,11 +32,7 @@ static void	philo_eat(t_table *table, t_philo *self)
 	usleep(table->time_eat * 1000);
 	self->left_fork->last_eater = self;
 	self->right_fork->last_eater = self;
-	pthread_mutex_unlock(&self->left_fork->mtx);
-	pthread_mutex_unlock(&self->right_fork->mtx);
-	pthread_mutex_lock(&(table->stdout_mtx));
-	printf("[!] - Philo %d dropped his forks!\n", self->id);
-	pthread_mutex_unlock(&(table->stdout_mtx));
+	drop_forks(self);
 	pthread_mutex_lock(&self->mtx);
 	self->times_eaten++;
 	self->action = SLEEP;

@@ -77,7 +77,8 @@ int	init_mutexes(void)
 	while (i < table->philo_count)
 	{
 		if (pthread_mutex_init(&table->philos[i].mtx, NULL)
-			|| (pthread_mutex_init(&table->forks[i].mtx, NULL)))
+			|| (pthread_mutex_init(&table->forks[i].mtx, NULL))
+			|| (pthread_mutex_init(&table->forks[i].last_eater_mtx, NULL)))
 			return (printf("%s[!] - Failed to init mutexes!%s\n", KRED, KNRM),
 				destroy_mutexes(), -1);
 		i++;
@@ -103,7 +104,8 @@ void	destroy_mutexes(void)
 	while (i < table->philo_count)
 	{
 		if (pthread_mutex_destroy(&table->philos[i].mtx)
-			|| (pthread_mutex_destroy(&table->forks[i].mtx)))
+			|| (pthread_mutex_destroy(&table->forks[i].mtx))
+			|| (pthread_mutex_destroy(&table->forks[i].last_eater_mtx)))
 			printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 		i++;
 	}

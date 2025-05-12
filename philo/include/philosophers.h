@@ -40,7 +40,8 @@ typedef enum e_action
 typedef struct s_fork
 {
 	struct s_philo	*last_eater;
-	pthread_mutex_t	mtx;
+	pthread_mutex_t	last_eater_mtx;	// Mutex for checking and writing last_eater
+	pthread_mutex_t	mtx;			// Mutex for eating with the fork
 }	t_fork;
 
 // Represents a singular philosopher or thinker.
@@ -76,8 +77,6 @@ typedef struct s_table
 	pthread_mutex_t	mtx;				// Mutex for the table
 }	t_table;
 
-// TODO : find a better name / use for index_mtx
-
 // Functions ===================================================================
 
 // Table functions - table.c
@@ -95,6 +94,7 @@ void		philos_init(void);
 void		update_last_change(t_philo *self);
 int			pickup_forks_even(t_table *table, t_philo *self);
 int			pickup_forks_uneven(t_table *table, t_philo *self);
+void		drop_forks(const t_philo *self);
 
 // Threads functions - threads.c
 int			launch_threads(void);
