@@ -19,7 +19,7 @@ static int	check_input(int argc, char **argv)
 		{
 			if (argv[i][j] < '0' || argv[i][j] > '9')
 				return (1);
-			if ((i == 1 && j > 1) || j > 8)
+			if (j > 8)
 				return (2);
 			j++;
 		}

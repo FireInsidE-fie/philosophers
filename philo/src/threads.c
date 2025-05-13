@@ -3,7 +3,7 @@
 /**
  * @brief Checks if a given philosopher has taken too much time to eat.
  */
-static bool	has_starved(t_philo *philo)
+bool	has_starved(t_philo *philo)
 {
 	t_table			*table;
 	uint64_t		diff;
@@ -11,9 +11,7 @@ static bool	has_starved(t_philo *philo)
 
 	table = get_table();
 	gettimeofday(&time, NULL);
-	pthread_mutex_lock(&philo->mtx);
 	diff = get_timestamp(time, table) - get_timestamp(philo->last_meal, table);
-	pthread_mutex_unlock(&philo->mtx);
 	if (diff >= table->time_die)
 	{
 		pthread_mutex_lock(&(table->stdout_mtx));
@@ -27,6 +25,7 @@ static bool	has_starved(t_philo *philo)
 		printf("%s%lu - %d died%s\n", KRED,
 			get_timestamp(philo->last_change, table), philo->id, KNRM);
 		pthread_mutex_unlock(&table->stdout_mtx);
+		pthread_mutex_unlock(&philo->mtx);
 		return (true);
 	}
 	return (false);
