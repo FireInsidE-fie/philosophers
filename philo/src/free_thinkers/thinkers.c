@@ -14,11 +14,7 @@ static void	philo_eat(t_table *table, t_philo *self)
 		return ;
 	pthread_mutex_lock(&table->mtx);
 	if (table->run_simulation == false)
-	{
-		pthread_mutex_unlock(&table->mtx);
-		drop_forks(self);
-		return ;
-	}
+		return (pthread_mutex_unlock(&table->mtx), drop_forks(self));
 	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->mtx);
 	if (gettimeofday(&self->last_meal, NULL) == -1)
@@ -28,15 +24,13 @@ static void	philo_eat(t_table *table, t_philo *self)
 	printf("%s%lu - %d is eating%s\n", KYEL,
 		get_timestamp(self->last_change, table), self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
+	self->times_eaten++;
+	self->action = SLEEP;
 	pthread_mutex_unlock(&self->mtx);
 	usleep(table->time_eat * 1000);
 	self->left_fork->last_eater = self;
 	self->right_fork->last_eater = self;
 	drop_forks(self);
-	pthread_mutex_lock(&self->mtx);
-	self->times_eaten++;
-	self->action = SLEEP;
-	pthread_mutex_unlock(&self->mtx);
 }
 
 /**
@@ -79,21 +73,15 @@ void	*philo_run(void *input)
 {
 	t_table		*table;
 	t_philo		*self;
-	static int	id;
 
 	table = get_table();
-	pthread_mutex_lock(&table->index_mtx);
-	self = &table->philos[id++];
-	pthread_mutex_lock(&self->mtx);
-	self->id = id;
-	pthread_mutex_unlock(&table->index_mtx);
-	pthread_mutex_unlock(&self->mtx);
+	self = input;
 	pthread_mutex_lock(&table->mtx);
 	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);
 		if (table->philo_count == 1)
-			;
+			usleep(1000);
 		else if (self->action == THINK)
 			philo_think(table, self);
 		else if (self->action == EAT)
@@ -124,6 +112,7 @@ void	philos_init(void)
 		table->philos[i].last_meal = table->start;
 		table->philos[i].left_fork = &table->forks[i];
 		table->philos[i].right_fork = &table->forks[(i + 1) % table->philo_count];
+		table->philos[i].id = i + 1;
 		i++;
 	}
 }

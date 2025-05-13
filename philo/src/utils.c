@@ -67,7 +67,7 @@ void	*ft_calloc(size_t number, size_t size)
  * @brief Returns the current time in milliseconds since the simulation
  * started.
  */
-uint64_t	get_timestamp(const struct timeval time, const t_table* table)
+uint64_t	get_timestamp(const struct timeval time, const t_table *table)
 {
 	uint64_t	timestamp;
 

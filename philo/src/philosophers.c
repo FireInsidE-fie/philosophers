@@ -3,7 +3,8 @@
 /**
  * @brief Checks input for anything other than digits.
  *
- * @return 0 if input is fine, 1 if not.
+ * @return 0 if input is fine, 1 if there's characters other than numbers, 2 if
+ * a number is too big.
  */
 static int	check_input(int argc, char **argv)
 {
@@ -18,6 +19,8 @@ static int	check_input(int argc, char **argv)
 		{
 			if (argv[i][j] < '0' || argv[i][j] > '9')
 				return (1);
+			if (j > 8)
+				return (2);
 			j++;
 		}
 		i++;
@@ -27,8 +30,6 @@ static int	check_input(int argc, char **argv)
 
 int	main(const int argc, char **argv)
 {
-	t_table	*table;
-
 	if (argc < 5 || argc > 6)
 		return (printf("[!] - Usage: ./philosophers number_of_philosophers "
 				"time_to_die time_to_eat time_to_sleep"
@@ -36,10 +37,10 @@ int	main(const int argc, char **argv)
 	if (check_input(argc, argv) == 1)
 		return (printf("[!] - Please only provide positive"
 				" integers as arguments.\n"), 1);
+	if (check_input(argc, argv) == 2)
+		return (printf("[!] - really? please provide sensible values\n"), 1);
 	if (init_table(argv) == 1)
 		return (1);
-	table = get_table();
-	printf("[!] - Philo count = %d\n", table->philo_count);
 	init_mutexes();
 	launch_threads();
 	wait_on_threads();

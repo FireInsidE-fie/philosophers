@@ -73,7 +73,6 @@ typedef struct s_table
 	t_fork			*forks;
 	pthread_mutex_t	stdout_mtx;			// Mutex for standard output
 	pthread_mutex_t	stderr_mtx;			// Mutex for standard error
-	pthread_mutex_t	index_mtx;			// Mutex for philosophers' indexes
 	pthread_mutex_t	mtx;				// Mutex for the table
 }	t_table;
 
@@ -103,7 +102,7 @@ int			wait_on_threads(void);
 // General utils - utils.c
 int			ft_atoi(const char *str);
 size_t		ft_strlen(const char *str);
-uint64_t	get_timestamp(const struct timeval time, const t_table* table);
+uint64_t	get_timestamp(const struct timeval time, const t_table *table);
 void		ft_memset(void *mem, size_t size);
 void		*ft_calloc(size_t number, size_t size);
 

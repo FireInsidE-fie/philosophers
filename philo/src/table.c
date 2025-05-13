@@ -25,7 +25,6 @@ t_table	*get_table(void)
 int	init_table(char **argv)
 {
 	t_table	*table;
-	int		i;
 
 	table = get_table();
 	if (!table)
@@ -35,12 +34,9 @@ int	init_table(char **argv)
 	table->philos = ft_calloc(table->philo_count, sizeof(t_philo));
 	if (!table->philos)
 		return (free(table), 1);
-	table->forks = malloc(sizeof(t_fork) * table->philo_count);
+	table->forks = ft_calloc(table->philo_count, sizeof(t_fork));
 	if (!table->forks)
 		return (free(table->philos), free(table), 1);
-	i = 0;
-	while (i < table->philo_count)
-		table->forks[i++].last_eater = NULL;
 	table->time_die = ft_atoi(argv[2]);
 	table->time_eat = ft_atoi(argv[3]);
 	table->time_sleep = ft_atoi(argv[4]);
@@ -83,7 +79,6 @@ int	init_mutexes(void)
 				destroy_mutexes(), -1);
 		i++;
 	}
-	pthread_mutex_init(&table->index_mtx, NULL);
 	printf("[!] - Successfully initialized mutexes!\n");
 	return (0);
 }
@@ -109,7 +104,6 @@ void	destroy_mutexes(void)
 			printf("%s[!] - Failed to destroy mutexes!%s\n", KRED, KNRM);
 		i++;
 	}
-	pthread_mutex_destroy(&table->index_mtx);
 	pthread_mutex_unlock(&table->mtx);
 	if (pthread_mutex_destroy(&table->mtx) != 0)
 		printf("%s[!] - Failed to destroy mutexes (table)!%s\n", KRED, KNRM);

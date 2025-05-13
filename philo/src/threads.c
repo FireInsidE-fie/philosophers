@@ -3,19 +3,19 @@
 /**
  * @brief Checks if a given philosopher has taken too much time to eat.
  */
-bool has_starved(t_philo *philo)
+bool	has_starved(t_philo *philo)
 {
 	t_table			*table;
-	uint64_t		difference;
+	uint64_t		diff;
 	struct timeval	time;
 
 	table = get_table();
 	gettimeofday(&time, NULL);
-	difference = get_timestamp(time, table) - get_timestamp(philo->last_meal, table);
-	if (difference >= table->time_die)
+	diff = get_timestamp(time, table) - get_timestamp(philo->last_meal, table);
+	if (diff >= table->time_die)
 	{
 		pthread_mutex_lock(&(table->stdout_mtx));
-		printf("[!] - Difference is %lu...\n", difference);
+		printf("[!] - Difference is %lu...\n", diff);
 		pthread_mutex_unlock(&(table->stdout_mtx));
 		update_last_change(philo);
 		pthread_mutex_lock(&table->mtx);
@@ -86,10 +86,10 @@ int	launch_threads(void)
 	pthread_create(&table->waiter, NULL, monitor, NULL);
 	while (i < table->philo_count)
 	{
-		if (pthread_create(&table->philos[i].thread, NULL, philo_run, NULL) != 0)
+		if (pthread_create(&table->philos[i].thread,
+			NULL, philo_run, &table->philos[i]) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
-			printf("%s[!] - Launching thread %d...%s\n", KRED, i, KNRM);
 			while (i >= 0)
 				pthread_join(table->philos[--i].thread, NULL);
 			return (1);
