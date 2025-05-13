@@ -16,11 +16,10 @@ static void	philo_eat(t_table *table, t_philo *self)
 	if (table->run_simulation == false)
 		return (pthread_mutex_unlock(&table->mtx), drop_forks(self));
 	pthread_mutex_unlock(&table->mtx);
+	update_last_change(self);
 	pthread_mutex_lock(&self->mtx);
-	if (gettimeofday(&self->last_meal, NULL) == -1)
-		sfwrite_stderr("[!] - Failed to get time of day!\n");
-	self->last_change = self->last_meal;
-	pthread_mutex_lock(&(table->stdout_mtx));
+	self->last_meal = self->last_change;
+	pthread_mutex_lock(&table->stdout_mtx);
 	printf("%s%lu - %d is eating%s\n", KYEL,
 		get_timestamp(self->last_change, table), self->id, KNRM);
 	pthread_mutex_unlock(&(table->stdout_mtx));
