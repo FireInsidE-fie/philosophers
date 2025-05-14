@@ -61,7 +61,7 @@ typedef struct s_philo
 // The main struct of the program, overseeing the whole simulation.
 typedef struct s_table
 {
-	uint8_t			philo_count;
+	uint8_t			n_philos;
 	bool			run_simulation;		// Determines if the sim continues
 	struct timeval	start;				// The time at which the sim started
 	pthread_t		waiter;				// Monitoring thread

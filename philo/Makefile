@@ -1,6 +1,6 @@
 NAME		=	philosophers
 CC			=	cc
-CFLAGS		=	-Wall -Wextra -Werror -std=c11 -g
+CFLAGS		=	-Wall -Wextra -Werror
 RM			=	rm
 RMFLAGS		=	-f
 
@@ -14,8 +14,8 @@ CFILES		=	$(SRCDIR)/philosophers.c \
 				$(SRCDIR)/utils.c
 OBJS		=	$(CFILES:.c=.o)
 
-INCLDIR		=	include/
-IFILES		=	$(INCLDIR)philosophers.h
+IDIR		=	include/
+IFILES		=	$(IDIR)philosophers.h
 
 LIBS		=	-lpthread
 
@@ -24,7 +24,7 @@ all:			$(NAME)
 
 %.o:			%.c $(IFILES)
 				@printf "\rCompiling $<..."
-				@$(CC) $(CFLAGS) -I$(INCLDIR) -c $< -o $@
+				@$(CC) $(CFLAGS) -I$(IDIR) -c $< -o $@
 
 $(NAME):		$(OBJS)
 				@printf "\rCompiling $(NAME)..."

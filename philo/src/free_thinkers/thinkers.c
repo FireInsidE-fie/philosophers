@@ -80,7 +80,7 @@ void	*philo_run(void *input)
 	while (table->run_simulation == true)
 	{
 		pthread_mutex_unlock(&table->mtx);
-		if (table->philo_count == 1)
+		if (table->n_philos == 1)
 			usleep(1000);
 		else if (self->action == THINK)
 			philo_think(table, self);
@@ -105,13 +105,13 @@ void	philos_init(void)
 
 	i = 0;
 	table = get_table();
-	while (i < table->philo_count)
+	while (i < table->n_philos)
 	{
 		table = get_table();
 		table->philos[i].times_eaten = 0;
 		table->philos[i].last_meal = table->start;
 		table->philos[i].left_fork = &table->forks[i];
-		table->philos[i].right_fork = &table->forks[(i + 1) % table->philo_count];
+		table->philos[i].right_fork = &table->forks[(i + 1) % table->n_philos];
 		table->philos[i].id = i + 1;
 		i++;
 	}

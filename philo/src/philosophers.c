@@ -31,9 +31,9 @@ static int	check_input(int argc, char **argv)
 int	main(const int argc, char **argv)
 {
 	if (argc < 5 || argc > 6)
-		return (printf("[!] - Usage: ./philosophers number_of_philosophers "
+		return (printf("Usage: ./philosophers number_of_philosophers "
 				"time_to_die time_to_eat time_to_sleep"
-				" [number_of_times_each_philosopher_must_eat]"), 1);
+				" [number_of_times_each_philosopher_must_eat]\n"), 1);
 	if (check_input(argc, argv) == 1)
 		return (printf("[!] - Please only provide positive"
 				" integers as arguments.\n"), 1);
