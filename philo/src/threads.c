@@ -33,7 +33,7 @@ static bool	has_starved(t_table *table, t_philo *philo)
 /**
  * Checks if a philosopher has eaten enough times.
  */
-static bool	has_eaten_enough(t_table *table, t_philo *philo)
+static bool	eaten_enough(t_table *table, t_philo *philo)
 {
 	bool	ret;
 
@@ -57,26 +57,26 @@ void	*monitor(void *input)
 {
 	t_table	*table;
 	int		i;
-	bool	all_eaten_enough;
+	bool	all_satisfied;
 
 	table = get_table();
 	i = 0;
-	all_eaten_enough = true;
+	all_satisfied = true;
 	while (i < table->n_philos)
 	{
-		all_eaten_enough = has_eaten_enough(table, &table->philos[i]);
+		all_satisfied = all_satisfied & eaten_enough(table, &table->philos[i]);
 		if (has_starved(table, &table->philos[i]) == true)
 			return (input);
 		if (++i == table->n_philos)
 		{
-			if (all_eaten_enough == true)
+			if (all_satisfied == true)
 			{
 				pthread_mutex_lock(&table->mtx);
 				table->run_simulation = false;
 				return (pthread_mutex_unlock(&table->mtx), input);
 			}
 			i = 0; // infinite loop
-			all_eaten_enough = true;
+			all_satisfied = true;
 		}
 	}
 	return (input);
