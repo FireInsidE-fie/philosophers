@@ -64,7 +64,7 @@ typedef struct s_table
 	uint8_t			n_philos;
 	bool			run_simulation;		// Determines if the sim continues
 	struct timeval	start;				// The time at which the sim started
-	pthread_t		waiter;				// Monitoring thread
+	pthread_t		monitor;			// Monitoring thread
 	uint32_t		time_die;			// Time it takes to die after eating
 	uint32_t		time_eat;			// Time it takes to eat
 	uint32_t		time_sleep;			// Time it takes to sleep

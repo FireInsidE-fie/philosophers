@@ -92,7 +92,7 @@ int	launch_threads(void)
 	gettimeofday(&table->start, NULL);
 	philos_init();
 	pthread_mutex_lock(&(table->mtx));
-	pthread_create(&table->waiter, NULL, monitor, NULL);
+	pthread_create(&table->monitor, NULL, monitor, NULL);
 	while (i < table->n_philos)
 	{
 		if (pthread_create(&table->philos[i].thread,
@@ -123,7 +123,7 @@ int	wait_on_threads(void)
 			sfwrite_stderr("[!] - Failed to join a thread!");
 		i++;
 	}
-	if (pthread_join(table->waiter, NULL) != 0)
+	if (pthread_join(table->monitor, NULL) != 0)
 		sfwrite_stderr("[!] - Failed to join a thread!");
 	return (0);
 }
