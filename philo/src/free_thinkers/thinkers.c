@@ -4,6 +4,8 @@
  * @brief Makes a philosopher eat by making him pick up his two forks
  * (mutexes) and waiting for `time_eat` milliseconds.
  */
+// TODO philosophers sometimes stop eating too quick, ending the simulation
+// before everyone ate enough (in case of min_times_eaten)
 static void	philo_eat(t_table *table, t_philo *self)
 {
 	if (self->id % 2 == 0 && pickup_forks_even(self) == -1

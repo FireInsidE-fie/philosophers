@@ -3,13 +3,13 @@
 /**
  * @brief Checks if a given philosopher has taken too much time to eat.
  */
-bool	has_starved(t_philo *philo)
+static bool	has_starved(t_table *table, t_philo *philo)
 {
-	t_table			*table;
 	uint64_t		diff;
 	struct timeval	time;
 
 	table = get_table();
+	pthread_mutex_lock(&philo->mtx);
 	gettimeofday(&time, NULL);
 	diff = get_timestamp(time, table) - get_timestamp(philo->last_meal, table);
 	if (diff >= table->time_die)
@@ -25,10 +25,26 @@ bool	has_starved(t_philo *philo)
 		printf("%s%lu - %d died%s\n", KRED,
 			get_timestamp(philo->last_change, table), philo->id, KNRM);
 		pthread_mutex_unlock(&table->stdout_mtx);
-		pthread_mutex_unlock(&philo->mtx);
-		return (true);
+		return (pthread_mutex_unlock(&philo->mtx), true);
 	}
-	return (false);
+	return (pthread_mutex_unlock(&philo->mtx), false);
+}
+
+/**
+ * Checks if a philosopher has eaten enough times.
+ */
+static bool	has_eaten_enough(t_table *table, t_philo *philo)
+{
+	bool	ret;
+
+	pthread_mutex_lock(&philo->mtx);
+	pthread_mutex_lock(&table->mtx);
+	ret = true;
+	if (philo->times_eaten < table->min_times_eaten)
+		ret = false;
+	pthread_mutex_unlock(&table->mtx);
+	pthread_mutex_unlock(&philo->mtx);
+	return (ret);
 }
 
 /**
@@ -46,19 +62,12 @@ void	*monitor(void *input)
 	table = get_table();
 	i = 0;
 	all_eaten_enough = true;
-	while (i < table->philo_count)
+	while (i < table->n_philos)
 	{
-		pthread_mutex_lock(&table->philos[i].mtx);
-		pthread_mutex_lock(&table->mtx);
-		if (all_eaten_enough == true
-			&& table->philos[i].times_eaten < table->min_times_eaten)
-			all_eaten_enough = false;
-		pthread_mutex_unlock(&table->mtx);
-		if (has_starved(&table->philos[i]) == true)
+		all_eaten_enough = has_eaten_enough(table, &table->philos[i]);
+		if (has_starved(table, &table->philos[i]) == true)
 			return (input);
-		pthread_mutex_unlock(&table->philos[i].mtx);
-		i++;
-		if (i == table->philo_count)
+		if (++i == table->n_philos)
 		{
 			if (all_eaten_enough == true)
 			{
@@ -84,10 +93,10 @@ int	launch_threads(void)
 	philos_init();
 	pthread_mutex_lock(&(table->mtx));
 	pthread_create(&table->waiter, NULL, monitor, NULL);
-	while (i < table->philo_count)
+	while (i < table->n_philos)
 	{
 		if (pthread_create(&table->philos[i].thread,
-			NULL, philo_run, &table->philos[i]) != 0)
+				NULL, philo_run, &table->philos[i]) != 0)
 		{
 			pthread_mutex_unlock(&(table->mtx));
 			while (i >= 0)
@@ -108,7 +117,7 @@ int	wait_on_threads(void)
 
 	table = get_table();
 	i = 0;
-	while (i < table->philo_count)
+	while (i < table->n_philos)
 	{
 		if (pthread_join(table->philos[i].thread, NULL) != 0)
 			sfwrite_stderr("[!] - Failed to join a thread!");
