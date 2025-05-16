@@ -17,23 +17,26 @@ void	update_last_change(t_philo *self)
  * @return 0 if everything can proceed, -1 if a fork was last picked up
  * by self, meaning we have to let someone else take it.
  */
-int	pickup_forks_even(t_philo *self)
+int	pickup_forks_even(t_table *table, t_philo *self)
 {
 	pthread_mutex_lock(&self->left_fork->last_eater_mtx);
-	if (self->left_fork->last_eater == self)
-	{
-		pthread_mutex_unlock(&self->left_fork->last_eater_mtx);
-		return (-1);
-	}
+	pthread_mutex_lock(&table->mtx);
+	if (!table->run_simulation || self->left_fork->last_eater == self)
+		return (pthread_mutex_unlock(&table->mtx),
+			pthread_mutex_unlock(&self->left_fork->last_eater_mtx), -1);
+	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->left_fork->mtx);
 	pthread_mutex_lock(&self->right_fork->last_eater_mtx);
-	if (self->right_fork->last_eater == self)
+	pthread_mutex_lock(&table->mtx);
+	if (!table->run_simulation || self->right_fork->last_eater == self)
 	{
+		pthread_mutex_unlock(&table->mtx);
 		pthread_mutex_unlock(&self->left_fork->mtx);
 		pthread_mutex_unlock(&self->left_fork->last_eater_mtx);
 		pthread_mutex_unlock(&self->right_fork->last_eater_mtx);
 		return (-1);
 	}
+	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->right_fork->mtx);
 	return (0);
 }
@@ -45,23 +48,26 @@ int	pickup_forks_even(t_philo *self)
  * @return 0 if everything can proceed, -1 if a fork was last picked up
  * by self, meaning we have to let someone else take it.
  */
-int	pickup_forks_uneven(t_philo *self)
+int	pickup_forks_uneven(t_table *table, t_philo *self)
 {
 	pthread_mutex_lock(&self->right_fork->last_eater_mtx);
-	if (self->right_fork->last_eater == self)
-	{
-		pthread_mutex_unlock(&self->right_fork->last_eater_mtx);
-		return (-1);
-	}
+	pthread_mutex_lock(&table->mtx);
+	if (!table->run_simulation || self->right_fork->last_eater == self)
+		return (pthread_mutex_unlock(&table->mtx),
+			pthread_mutex_unlock(&self->right_fork->last_eater_mtx), -1);
+	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->right_fork->mtx);
 	pthread_mutex_lock(&self->left_fork->last_eater_mtx);
-	if (self->left_fork->last_eater == self)
+	pthread_mutex_lock(&table->mtx);
+	if (!table->run_simulation || self->left_fork->last_eater == self)
 	{
+		pthread_mutex_unlock(&table->mtx);
 		pthread_mutex_unlock(&self->right_fork->mtx);
 		pthread_mutex_unlock(&self->right_fork->last_eater_mtx);
 		pthread_mutex_unlock(&self->left_fork->last_eater_mtx);
 		return (-1);
 	}
+	pthread_mutex_unlock(&table->mtx);
 	pthread_mutex_lock(&self->left_fork->mtx);
 	return (0);
 }

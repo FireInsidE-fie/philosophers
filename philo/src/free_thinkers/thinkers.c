@@ -6,10 +6,10 @@
  */
 static void	philo_eat(t_table *table, t_philo *self)
 {
-	if (self->id % 2 == 0 && pickup_forks_even(self) == -1
+	if (self->id % 2 == 0 && pickup_forks_even(table, self) == -1
 		&& usleep(1000) == 0)
 		return ;
-	if (self->id % 2 != 0 && pickup_forks_uneven(self) == -1
+	if (self->id % 2 != 0 && pickup_forks_uneven(table, self) == -1
 		&& usleep(1000) == 0)
 		return ;
 	pthread_mutex_lock(&table->mtx);
@@ -81,7 +81,7 @@ void	*philo_run(void *input)
 	{
 		pthread_mutex_unlock(&table->mtx);
 		if (table->n_philos == 1)
-			usleep(1000);
+			usleep(table->time_die);
 		else if (self->action == THINK)
 			philo_think(table, self);
 		else if (self->action == EAT)
