@@ -88,26 +88,27 @@ int	launch_threads(void)
 	int			i;
 
 	table = get_table();
-	i = 0;
 	gettimeofday(&table->start, NULL);
 	philos_init();
-	pthread_mutex_lock(&(table->mtx));
-	pthread_create(&table->monitor, NULL, monitor, NULL);
-	while (i < table->n_philos)
+	pthread_mutex_lock(&table->mtx);
+	if (pthread_create(&table->monitor, NULL, monitor, NULL) != 0)
+		return (pthread_mutex_unlock(&table->mtx), 1);
+	i = -1;
+	while (++i < table->n_philos)
 	{
 		if (pthread_create(&table->philos[i].thread,
 				NULL, philo_run, &table->philos[i]) != 0)
 		{
-			pthread_mutex_unlock(&(table->mtx));
+			table->run_simulation = false;
+			pthread_mutex_unlock(&table->mtx);
+			pthread_join(table->monitor, NULL);
 			while (i >= 0)
 				pthread_join(table->philos[--i].thread, NULL);
-			return (1);
+			return (pthread_mutex_unlock(&table->mtx), 1);
 		}
 		usleep(1000);
-		i++;
 	}
-	pthread_mutex_unlock(&(table->mtx));
-	return (0);
+	return (pthread_mutex_unlock(&table->mtx), 0);
 }
 
 int	wait_on_threads(void)
